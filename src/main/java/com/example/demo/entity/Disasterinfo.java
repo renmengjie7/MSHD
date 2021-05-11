@@ -15,16 +15,34 @@ public class Disasterinfo {
     private String unifiedId;
     private String dId;
     private String province;
+    private String city;
+    private String country;
+    private String town;
+    private String village;
     private String date;
     private String location;
     private Float longitude;
     private Float latitude;
     private Float depth;
     private Float magnitude;
+    private String picture;
     private String reportingUnit;
-    private String city;
-    private String country;
-    private String town;
-    private String village;
-    private byte[] picture;
+
+    public Disasterinfo(String unifiedId, String dId, String province, String city, String country, String town, String village, String date, String location, Float longitude, Float latitude, Float depth, Float magnitude, String picture, String reportingUnit) {
+        this.unifiedId = unifiedId;
+        this.dId = dId;
+        this.province = province;
+        this.city = city;
+        this.country = country;
+        this.town = town;
+        this.village = village;
+        this.date = date;
+        this.location = location;
+        this.longitude = longitude;
+        this.latitude = latitude;
+        this.depth = depth;
+        this.magnitude = magnitude;
+        this.picture = picture;
+        this.reportingUnit = reportingUnit;
+    }
 }
