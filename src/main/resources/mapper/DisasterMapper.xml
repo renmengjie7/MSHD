@@ -28,4 +28,8 @@
     picture
   </sql>
 
+  <select id="getDisasterNotCoded" parameterType="com.example.demo2.bean.User" resultMap="BaseResultMap">
+        select * from disasterinfo where
+  </select>
+
 </mapper>

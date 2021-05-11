@@ -47,7 +47,7 @@
         <!--生成对应表及类名
         去除example
         -->
-        <table tableName="disasterinfo" domainObjectName="Disaster"
+        <table tableName="china_administrative" domainObjectName="Code"
                enableCountByExample="false"
                enableUpdateByExample="false"
                enableDeleteByExample="false"
