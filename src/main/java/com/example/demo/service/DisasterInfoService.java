@@ -2,6 +2,7 @@ package com.example.demo.service;
 
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -17,14 +18,13 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
-
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.StringReader;
-
+import java.util.List;
 
 //基本震情上传的微服务
 @Service
@@ -207,6 +207,20 @@ public class DisasterInfoService {
     public Boolean encodeDisasterInfo(int id){
         return true;
     }
+
+    //从数据库中选出未编码的震情
+    public List<Disasterinfo> getDisasterNotCoded() {
+        QueryWrapper<Disasterinfo> queryWrapper=new QueryWrapper<>();
+        queryWrapper.eq("d_id","").or().isNull("d_id");
+
+        return disasterMapper.selectList(queryWrapper);
+    }
+
+    //更新编码
+    public void setCode(Disasterinfo disaster) {
+        disasterMapper.updateById(disaster);
+    }
+
 
 
 }
