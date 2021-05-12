@@ -11,10 +11,10 @@ create table softwaremanage.disasterinfo
     village        varchar(255) null,
     date           varchar(255) null,
     location       varchar(100) null,
-    longitude      double       null,
-    latitude       double       null,
-    depth          double       null,
-    magnitude      double       null,
+    longitude      double(5, 2) null,
+    latitude       double(4, 2) null,
+    depth          float        null,
+    magnitude      float        null,
     picture        varchar(20)  null,
     reporting_unit varchar(50)  null
 )
