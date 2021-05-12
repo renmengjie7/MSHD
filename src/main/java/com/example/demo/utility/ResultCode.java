@@ -4,5 +4,5 @@ public interface ResultCode {
     int success=1;
     int fail=2;
     int exception=3;
-    int abnormal=4;
+    int invalid=4;
 }

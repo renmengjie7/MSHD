@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 public class Disasterinfo {
     @TableId(value = "id", type = IdType.AUTO)
     private int id;
-    private String unifiedId;
+    private String unifiedId="501";
     private String dId;
     private String province;
     private String city;
