@@ -48,7 +48,7 @@ public class DisasterController {
         if(disasters.isEmpty()){
             System.out.println("\n不存在未编码的震情\n");
         }
-        String province,city,country,town,village,date,code;
+        String province,city,country,town,village,date,code,date_form;
         for(Disasterinfo disaster:disasters) {
             province=disaster.getProvince();
             city=disaster.getCity();
@@ -56,8 +56,12 @@ public class DisasterController {
             town= disaster.getTown();
             village=disaster.getVillage();
             date=disaster.getDate();
+            if(date==null) {
+                date_form="00000000000000";
+                System.out.println("\n时间信息为空\n");
+            }
             //去除日期中的空格，-和:
-            String date_form = date.replaceAll("[[\\s-:punct:]]","");
+            else date_form = date.replaceAll("[[\\s-:punct:]]","");
             //根据地理位置信息找到code
             code=chinaAdministrtiveService.findCode(province,city,country,town,village);
             if(code==null){

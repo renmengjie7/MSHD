@@ -10,7 +10,7 @@ Target Server Type    : MYSQL
 Target Server Version : 80019
 File Encoding         : 65001
 
-Date: 2021-05-12 10:04:18
+Date: 2021-05-12 23:37:16
 */
 
 SET FOREIGN_KEY_CHECKS=0;
@@ -35,11 +35,12 @@ CREATE TABLE `disasterinfo` (
   `magnitude` float(255,1) DEFAULT NULL,
   `picture` blob,
   `reporting_unit` varchar(50) COLLATE utf8_bin DEFAULT NULL,
+  `unified_id` char(19) COLLATE utf8_bin DEFAULT NULL COMMENT '统一编码',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
 -- ----------------------------
 -- Records of disasterinfo
 -- ----------------------------
-INSERT INTO `disasterinfo` VALUES ('1', '11010100100120210421101557', '北京', '市辖区', '东城区', '东华门街道', '多福巷社区', '2021-04-21 10:15:57', '北京东城区', '117.00', '40.00', '15', '7.0', null, '北京地震局');
-INSERT INTO `disasterinfo` VALUES ('2', '14040300200220210421221640', '山西', '长治', '潞州区', '西街街道', '参府社区', '2021-04-21 22:16:40', '山西省长治市潞州区', '113.01', '35.50', '10', '5.5', null, '山西地震局');
+INSERT INTO `disasterinfo` VALUES ('1', '11010100100120210421101557', '北京', '市辖区', '东城区', '东华门街道', '多福巷社区', '2021-04-21 10:15:57', '北京东城区', '117.00', '40.00', '15', '7.0', null, '北京地震局', null);
+INSERT INTO `disasterinfo` VALUES ('2', '', '山西', '长治', '潞州区', '西街街道', '', '2021-04-21 22:16:40', '山西省长治市潞州区', '113.01', '35.50', '10', '5.5', null, '山西地震局', null);
