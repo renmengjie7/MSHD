@@ -47,8 +47,6 @@ public class DisasterInfoService {
             String result = "";
             while((line=bufferedReader.readLine()) != null ) result+=line;
             String filename=srcFile.getOriginalFilename();
-            System.out.println(filename);
-            System.out.println(filename.split("\\.")[0]);
             switch (filename.split("\\.")[1]){
                 case "json":
                     return jsonParse(result);
@@ -114,7 +112,6 @@ public class DisasterInfoService {
             //获取所有book节点的集合
             NodeList disasterInfoList = document.getElementsByTagName("info");
             //通过nodelist的getLength()方法可以获取bookList的长度
-            System.out.println("一共有" + disasterInfoList.getLength() + "个灾情");
             //遍历每一个book节点
             for (int i = 0; i < disasterInfoList.getLength(); i++) {
                 //通过 item(i)方法 获取一个book节点，nodelist的索引值从0开始
@@ -173,7 +170,6 @@ public class DisasterInfoService {
                     }
                 }
                 disasterMapper.insert(disasterinfoEntity);
-                System.out.println(disasterinfoEntity);
             }
             jsonObject.put("ResultCode", ResultCode.success);
             jsonObject.put("msg", "xml file parse success");
