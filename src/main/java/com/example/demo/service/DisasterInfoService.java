@@ -230,4 +230,17 @@ public class DisasterInfoService {
         return true;
     }
 
+    //从数据库中选出未编码的震情
+    public List<Disasterinfo> getDisasterNotCoded() {
+        QueryWrapper<Disasterinfo> queryWrapper=new QueryWrapper<>();
+        queryWrapper.eq("d_id","").or().isNull("d_id");
+
+        return disasterMapper.selectList(queryWrapper);
+    }
+
+    //更新编码
+    public void setCode(Disasterinfo disaster) {
+        disasterMapper.updateById(disaster);
+    }
+
 }
