@@ -16,4 +16,8 @@ public class DisasterService {
     public List<Disaster> getDisasterNotCoded() {
         return disasterMapper.getDisasterNotCoded();
     }
+
+    public void setCode(Disaster disaster) {
+        disasterMapper.setCode(disaster);
+    }
 }

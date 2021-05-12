@@ -8,4 +8,6 @@ import java.util.List;
 @Mapper
 public interface DisasterMapper {
     List<Disaster> getDisasterNotCoded();
+
+    void setCode(Disaster disaster);
 }

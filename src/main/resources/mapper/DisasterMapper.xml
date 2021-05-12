@@ -28,8 +28,14 @@
     picture
   </sql>
 
-  <select id="getDisasterNotCoded" parameterType="com.example.demo2.bean.User" resultMap="BaseResultMap">
-        select * from disasterinfo where
+  <select id="getDisasterNotCoded" parameterType="com.example.demo2.bean.Disaster" resultMap="BaseResultMap">
+        select * from disasterinfo where d_id is null
   </select>
+
+  <update id="setCode" parameterType="com.example.demo2.bean.Disaster">
+    update disasterinfo
+    set d_id=#{dId}
+    where id=#{id}
+  </update>
 
 </mapper>
