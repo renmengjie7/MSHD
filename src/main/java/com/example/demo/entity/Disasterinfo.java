@@ -21,15 +21,14 @@ public class Disasterinfo {
     private String village;
     private String date;
     private String location;
-    private Float longitude;
-    private Float latitude;
-    private Float depth;
-    private Float magnitude;
+    private double longitude;
+    private double latitude;
+    private float depth;
+    private float magnitude;
     private String picture;
     private String reportingUnit;
 
-    public Disasterinfo(String unifiedId, String dId, String province, String city, String country, String town, String village, String date, String location, Float longitude, Float latitude, Float depth, Float magnitude, String picture, String reportingUnit) {
-        this.unifiedId = unifiedId;
+    public Disasterinfo(String dId, String province, String city, String country, String town, String village, String date, String location, double longitude, double latitude, float depth, float magnitude, String picture, String reportingUnit) {
         this.dId = dId;
         this.province = province;
         this.city = city;

@@ -8,12 +8,12 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.example.demo.entity.Disasterinfo;
 import com.example.demo.mapper.DisasterMapper;
 import com.example.demo.utility.ResultCode;
+import com.example.demo.vo.DataVO;
 import net.sf.json.JSONArray;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.w3c.dom.Document;
-import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
@@ -24,6 +24,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.StringReader;
+import java.util.List;
 
 
 //基本震情上传的微服务
@@ -67,28 +68,48 @@ public class DisasterInfoService {
         }
     }
 
+//    如果数据出现经纬度、时间一样的情况，就不插入
+    public Boolean existDisasterInfo(String date,String longitude,String latitude){
+        QueryWrapper<Disasterinfo> queryWrapper = Wrappers.query();
+        queryWrapper.eq("date",date);
+        queryWrapper.eq("longitude",longitude);
+        queryWrapper.eq("latitude",latitude);
+        List<Disasterinfo> disasterinfos=disasterMapper.selectList(queryWrapper);
+        if(disasterinfos.size()==0){
+            return false;
+        }
+        else {
+            return true;
+        }
+    }
+
     public JSONObject jsonParse(String content) {
         JSONObject jsonObject = new JSONObject();
         try {
+            jsonObject.put("ResultCode", ResultCode.success);
+            jsonObject.put("msg", "json file parse success");
+            jsonObject.put("data", "1");
             //            逻辑处理，存入数据库，需要判断是否重复
             org.json.JSONObject data = new org.json.JSONObject(content);
             org.json.JSONObject disasterInfo = new org.json.JSONObject(data.get("disasterInfo").toString());
             JSONArray infos = JSONArray.fromObject(disasterInfo.get("info").toString());
             for (int i = 0; i < infos.size(); i++) {
                 org.json.JSONObject info = new org.json.JSONObject(infos.get(i).toString());
-                int r = disasterMapper.insert(new Disasterinfo(
-                        "501", "", info.getString("province"),
-                        info.getString("city"), info.getString("country"),
-                        info.getString("town"), info.getString("village"),
-                        info.getString("date"), info.getString("location"),
-                        Float.parseFloat(info.getString("longitude")), Float.parseFloat(info.getString("latitude")),
-                        Float.parseFloat(info.getString("depth")), Float.parseFloat(info.getString("magnitude")),
-                        info.getString("picture"), info.getString("reportingUnit")));
-                this.encodeDisasterInfo(r);
+                if(existDisasterInfo(info.getString("date"),info.getString("longitude"),info.getString("latitude"))){
+                    jsonObject.put("msg","some info exist");
+                }
+                else {
+                    int r = disasterMapper.insert(new Disasterinfo(
+                             "", info.getString("province"),
+                            info.getString("city"), info.getString("country"),
+                            info.getString("town"), info.getString("village"),
+                            info.getString("date"), info.getString("location"),
+                            Double.parseDouble(info.getString("longitude")), Double.parseDouble(info.getString("latitude")),
+                            Float.parseFloat(info.getString("depth")), Float.parseFloat(info.getString("magnitude")),
+                            info.getString("picture"), info.getString("reportingUnit")));
+                    this.encodeDisasterInfo(r);
+                }
             }
-            jsonObject.put("ResultCode", ResultCode.success);
-            jsonObject.put("msg", "json file parse success");
-            jsonObject.put("data", "1");
             return jsonObject;
         } catch (Exception e) {
             e.printStackTrace();
@@ -106,6 +127,9 @@ public class DisasterInfoService {
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         DocumentBuilder builder= null;
         try {
+            jsonObject.put("ResultCode", ResultCode.success);
+            jsonObject.put("msg", "json file parse success");
+            jsonObject.put("data", "1");
             builder = factory.newDocumentBuilder();
             Document document = builder.parse(inputSource);
 
@@ -169,7 +193,12 @@ public class DisasterInfoService {
                         }
                     }
                 }
-                disasterMapper.insert(disasterinfoEntity);
+                if(existDisasterInfo(disasterinfoEntity.getDate(),disasterinfoEntity.getLongitude()+"",disasterinfoEntity.getLatitude()+"")){
+                    jsonObject.put("msg","some info exist");
+                }
+                else {
+                    disasterMapper.insert(disasterinfoEntity);
+                }
             }
             jsonObject.put("ResultCode", ResultCode.success);
             jsonObject.put("msg", "xml file parse success");
@@ -184,29 +213,21 @@ public class DisasterInfoService {
         }
     }
 
-    public JSONObject getDisaster(String key, Integer page, Integer limit){
-        JSONObject jsonObject=new JSONObject();
-
+    public DataVO<Disasterinfo> getDisaster(String key, Integer page, Integer limit){
+        DataVO dataVO=new DataVO();
+        dataVO.setCode(0);
+        dataVO.setMsg("");
         QueryWrapper<Disasterinfo> queryWrapper = Wrappers.query();
         IPage<Disasterinfo> disasterinfoIPage=new Page<>(page,limit);
         IPage<Disasterinfo> result=disasterMapper.selectPage(disasterinfoIPage,queryWrapper);
-
-        JSONObject data=new JSONObject();
-        data.put("count",result.getTotal());
-        data.put("disasterinfos",result.getRecords());
-        data.put("pageNumber",result.getPages());
-
-        jsonObject.put("ResultCode", ResultCode.success);
-        jsonObject.put("msg","success");
-        jsonObject.put("data",data);
-        return jsonObject;
+        dataVO.setCount(result.getTotal());
+        dataVO.setData(result.getRecords());
+        return dataVO;
     }
-
 
 //     根据传入的ID，查询数据库，
     public Boolean encodeDisasterInfo(int id){
         return true;
     }
-
 
 }
