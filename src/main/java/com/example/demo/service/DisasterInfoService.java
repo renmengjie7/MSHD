@@ -24,6 +24,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.StringReader;
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -36,91 +37,54 @@ public class DisasterInfoService {
     @Autowired
     private ChinaAdministrtiveService chinaAdministrtiveService;
 
-    public JSONObject disasterUpload(MultipartFile srcFile){
-        JSONObject jsonObject=new JSONObject();
-        if(srcFile.isEmpty()){
+    public JSONObject disasterUpload(MultipartFile srcFile) {
+        JSONObject jsonObject = new JSONObject();
+        if (srcFile.isEmpty()) {
             jsonObject.put("ResultCode", ResultCode.invalid);
-            jsonObject.put("msg","no file");
-            jsonObject.put("data","none");
+            jsonObject.put("msg", "no file");
+            jsonObject.put("data", "none");
             return jsonObject;
         }
         try {
-            BufferedReader bufferedReader =new BufferedReader(new InputStreamReader(srcFile.getInputStream()));
+            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(srcFile.getInputStream()));
             String line;
             String result = "";
-            while((line=bufferedReader.readLine()) != null ) result+=line;
-            String filename=srcFile.getOriginalFilename();
-            switch (filename.split("\\.")[1]){
+            while ((line = bufferedReader.readLine()) != null) result += line;
+            List<Disasterinfo> disasterinfos=null;
+            String filename = srcFile.getOriginalFilename();
+            switch (filename.split("\\.")[1]) {
                 case "json":
-                    return jsonParse(result);
+                    disasterinfos=jsonParse(result);
+                    break;
                 case "xml":
-                    return xmlParse(result);
+                    disasterinfos=xmlParse(result);
+                    break;
                 default:
                     jsonObject.put("ResultCode", ResultCode.invalid);
-                    jsonObject.put("msg","file type is invalid, only accept xml and json");
-                    jsonObject.put("data","none");
+                    jsonObject.put("msg", "file type is invalid, only accept xml and json");
+                    jsonObject.put("data", "none");
                     return jsonObject;
             }
-        } catch (IOException e) {
-            e.printStackTrace();
-            jsonObject.put("ResultCode", ResultCode.exception);
-            jsonObject.put("msg","json data is out of standard");
-            jsonObject.put("data","0");
-            return jsonObject;
-        }
-    }
-
-//    如果数据出现经纬度、时间一样的情况，就不插入
-    public Boolean existDisasterInfo(String date,String longitude,String latitude){
-        QueryWrapper<Disasterinfo> queryWrapper = Wrappers.query();
-        queryWrapper.eq("date",date);
-        queryWrapper.eq("longitude",longitude);
-        queryWrapper.eq("latitude",latitude);
-        List<Disasterinfo> disasterinfos=disasterMapper.selectList(queryWrapper);
-        if(disasterinfos.size()==0){
-            return false;
-        }
-        else {
-            return true;
-        }
-    }
-
-    public JSONObject jsonParse(String content) {
-        JSONObject jsonObject = new JSONObject();
-        try {
-            jsonObject.put("ResultCode", ResultCode.success);
-            jsonObject.put("msg", "json file parse success");
-            jsonObject.put("data", "1");
-            //            逻辑处理，存入数据库，需要判断是否重复
-            org.json.JSONObject data = new org.json.JSONObject(content);
-            org.json.JSONObject disasterInfo = new org.json.JSONObject(data.get("disasterInfo").toString());
-            JSONArray infos = JSONArray.fromObject(disasterInfo.get("info").toString());
-            for (int i = 0; i < infos.size(); i++) {
-                org.json.JSONObject info = new org.json.JSONObject(infos.get(i).toString());
-                if(existDisasterInfo(info.getString("date"),info.getString("longitude"),info.getString("latitude"))){
-                    jsonObject.put("msg","some info exist");
+            if (disasterinfos==null){
+                jsonObject.put("ResultCode", ResultCode.exception);
+                jsonObject.put("msg", "data is invalid or exist");
+                jsonObject.put("data", "0");
+            }
+            else if (disasterinfos.size()==0){
+                jsonObject.put("ResultCode", ResultCode.exception);
+                jsonObject.put("msg", "no data");
+                jsonObject.put("data", "0");
+            }
+            else {
+                for (int i=0;i<disasterinfos.size();i++){
+                    disasterMapper.insert(disasterinfos.get(i));
                 }
-                else {
-                    Disasterinfo disasterinfo=new Disasterinfo("", info.getString("province"),
-                            info.getString("city"), info.getString("country"),
-                            info.getString("town"), info.getString("village"),
-                            info.getString("date"), info.getString("location"),
-                            Double.parseDouble(info.getString("longitude")), Double.parseDouble(info.getString("latitude")),
-                            Float.parseFloat(info.getString("depth")), Float.parseFloat(info.getString("magnitude")),
-                            info.getString("picture"), info.getString("reportingUnit"));
-                    String code=chinaAdministrtiveService.doCode(disasterinfo.getProvince(),disasterinfo.getCity(),disasterinfo.getCountry(),
-                            disasterinfo.getTown(),disasterinfo.getVillage(),disasterinfo.getDate());
-                    if(code==null){
-                        jsonObject.put("msg", "some json data is out of standard");
-                    }
-                    else {
-                        disasterinfo.setDId(code);
-                        disasterMapper.insert(disasterinfo);
-                    }
-                }
+                jsonObject.put("ResultCode", ResultCode.success);
+                jsonObject.put("msg", "success");
+                jsonObject.put("data", "0");
             }
             return jsonObject;
-        } catch (Exception e) {
+        } catch (IOException e) {
             e.printStackTrace();
             jsonObject.put("ResultCode", ResultCode.exception);
             jsonObject.put("msg", "json data is out of standard");
@@ -129,16 +93,61 @@ public class DisasterInfoService {
         }
     }
 
-    public JSONObject xmlParse(String content){
-        JSONObject jsonObject=new JSONObject();
+    //如果数据出现经纬度、时间一样的情况，就不插入
+    public Boolean existDisasterInfo(String date, String longitude, String latitude) {
+        QueryWrapper<Disasterinfo> queryWrapper = Wrappers.query();
+        queryWrapper.eq("date", date);
+        queryWrapper.eq("longitude", longitude);
+        queryWrapper.eq("latitude", latitude);
+        List<Disasterinfo> disasterinfos = disasterMapper.selectList(queryWrapper);
+        if (disasterinfos.size() == 0) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    public List<Disasterinfo> jsonParse(String content) {
+        List<Disasterinfo> disasterinfos = new ArrayList<>();
+        //逻辑处理，存入数据库，需要判断是否重复
+        org.json.JSONObject data = new org.json.JSONObject(content);
+        org.json.JSONObject disasterInfo = new org.json.JSONObject(data.get("disasterInfo").toString());
+        JSONArray infos = JSONArray.fromObject(disasterInfo.get("info").toString());
+        for (int i = 0; i < infos.size(); i++) {
+            org.json.JSONObject info = new org.json.JSONObject(infos.get(i).toString());
+            if (existDisasterInfo(info.getString("date"), info.getString("longitude"), info.getString("latitude"))) {
+                //相同的数据已经出现过了
+                return null;
+            } else {
+                Disasterinfo disasterinfo = new Disasterinfo("", info.getString("province"),
+                        info.getString("city"), info.getString("country"),
+                        info.getString("town"), info.getString("village"),
+                        info.getString("date"), info.getString("location"),
+                        Double.parseDouble(info.getString("longitude")), Double.parseDouble(info.getString("latitude")),
+                        Float.parseFloat(info.getString("depth")), Float.parseFloat(info.getString("magnitude")),
+                        info.getString("picture"), info.getString("reportingUnit"));
+                String code = chinaAdministrtiveService.doCode(disasterinfo.getProvince(), disasterinfo.getCity(), disasterinfo.getCountry(),
+                        disasterinfo.getTown(), disasterinfo.getVillage(), disasterinfo.getDate());
+                if (code == null) {
+                    //编码时数据格式不正确
+                    return null;
+                } else {
+                    disasterinfo.setDId(code);
+                    disasterinfos.add(disasterinfo);
+                }
+            }
+        }
+        return disasterinfos;
+    }
+
+    public List<Disasterinfo> xmlParse(String content) {
+        List<Disasterinfo> disasterinfos = new ArrayList<>();
+
         StringReader sr = new StringReader(content);
         InputSource inputSource = new InputSource(sr);
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-        DocumentBuilder builder= null;
+        DocumentBuilder builder = null;
         try {
-            jsonObject.put("ResultCode", ResultCode.success);
-            jsonObject.put("msg", "json file parse success");
-            jsonObject.put("data", "1");
             builder = factory.newDocumentBuilder();
             Document document = builder.parse(inputSource);
 
@@ -151,7 +160,7 @@ public class DisasterInfoService {
                 Node disasterInfo = disasterInfoList.item(i);
                 //解析子节点
                 NodeList childNodes = disasterInfo.getChildNodes();
-                Disasterinfo disasterinfoEntity=new Disasterinfo();
+                Disasterinfo disasterinfoEntity = new Disasterinfo();
                 //遍历childNodes获取每个节点的节点名和节点值
                 for (int k = 0; k < childNodes.getLength(); k++) {
                     if (childNodes.item(k).getNodeType() == Node.ELEMENT_NODE) {
@@ -202,54 +211,52 @@ public class DisasterInfoService {
                         }
                     }
                 }
-                if(existDisasterInfo(disasterinfoEntity.getDate(),disasterinfoEntity.getLongitude()+"",disasterinfoEntity.getLatitude()+"")){
-                    jsonObject.put("msg","some info exist");
-                }
-                else {
+                if (existDisasterInfo(disasterinfoEntity.getDate(), disasterinfoEntity.getLongitude() + "", disasterinfoEntity.getLatitude() + "")) {
+                    //信息已经存在
+                    return null;
+                } else {
                     //一体化编码
-                    String code=chinaAdministrtiveService.doCode(disasterinfoEntity.getProvince(),disasterinfoEntity.getCity(),disasterinfoEntity.getCountry(),
-                            disasterinfoEntity.getTown(),disasterinfoEntity.getVillage(),disasterinfoEntity.getDate());
-                    if(code==null){
-                        jsonObject.put("msg", "some json data is out of standard");
-                    }
-                    else {
+                    String code = chinaAdministrtiveService.doCode(disasterinfoEntity.getProvince(), disasterinfoEntity.getCity(), disasterinfoEntity.getCountry(),
+                            disasterinfoEntity.getTown(), disasterinfoEntity.getVillage(), disasterinfoEntity.getDate());
+                    if (code == null) {
+                        //一体化编码出错
+                        return null;
+                    } else {
                         disasterinfoEntity.setDId(code);
-                        disasterMapper.insert(disasterinfoEntity);
+                        disasterinfos.add(disasterinfoEntity);
                     }
                 }
             }
-            jsonObject.put("ResultCode", ResultCode.success);
-            jsonObject.put("msg", "xml file parse success");
-            jsonObject.put("data", "1");
-            return jsonObject;
-        } catch (Exception e) {
-            e.printStackTrace();
-            jsonObject.put("ResultCode", ResultCode.exception);
-            jsonObject.put("msg", "json data is out of standard");
-            jsonObject.put("data", "0");
-            return jsonObject;
         }
+        catch (Exception e){
+            e.printStackTrace();
+            return null;
+        }
+        return disasterinfos;
     }
 
-    public DataVO<Disasterinfo> getDisaster(String key, Integer page, Integer limit){
-        DataVO dataVO=new DataVO();
+
+    public DataVO<Disasterinfo> getDisaster(String key, Integer page, Integer limit) {
+        DataVO dataVO = new DataVO();
         dataVO.setCode(0);
         dataVO.setMsg("");
         QueryWrapper<Disasterinfo> queryWrapper = Wrappers.query();
-        IPage<Disasterinfo> disasterinfoIPage=new Page<>(page,limit);
-        IPage<Disasterinfo> result=disasterMapper.selectPage(disasterinfoIPage,queryWrapper);
+        IPage<Disasterinfo> disasterinfoIPage = new Page<>(page, limit);
+        IPage<Disasterinfo> result = disasterMapper.selectPage(disasterinfoIPage, queryWrapper);
         dataVO.setCount(result.getTotal());
         dataVO.setData(result.getRecords());
         return dataVO;
     }
 
+
     //从数据库中选出未编码的震情
     public List<Disasterinfo> getDisasterNotCoded() {
-        QueryWrapper<Disasterinfo> queryWrapper=new QueryWrapper<>();
-        queryWrapper.eq("d_id","").or().isNull("d_id");
+        QueryWrapper<Disasterinfo> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("d_id", "").or().isNull("d_id");
 
         return disasterMapper.selectList(queryWrapper);
     }
+
 
     //更新编码
     public void setCode(Disasterinfo disaster) {
