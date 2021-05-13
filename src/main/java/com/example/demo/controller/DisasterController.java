@@ -40,7 +40,6 @@ public class DisasterController {
     }
 
 
-
     //从数据库中读取位置信息
     @GetMapping("/code")
     @ResponseBody
@@ -78,6 +77,8 @@ public class DisasterController {
         }
 
     }
+
+
 
 
 }

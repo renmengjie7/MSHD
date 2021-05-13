@@ -136,7 +136,6 @@ public class DisasterInfoService {
                     disasterinfos.add(disasterinfo);
                 }
             }
-        }
         return disasterinfos;
     }
 
@@ -253,7 +252,6 @@ public class DisasterInfoService {
     public List<Disasterinfo> getDisasterNotCoded() {
         QueryWrapper<Disasterinfo> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("d_id", "").or().isNull("d_id");
-
         return disasterMapper.selectList(queryWrapper);
     }
 

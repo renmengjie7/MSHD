@@ -48,12 +48,12 @@ public class ChinaAdministrtiveService {
     public String doCode(String province,String city,String country,String town,String village,String date){
         //获取未编码的震情对象集
         String code;
-        String sample="2021-04-21 22:16:40";
-        if (date.length()!=sample.length()){
-            return null;
-        }
         //去除日期中的空格，-和:
         String date_form = date.replaceAll("[[\\s-:punct:]]","");
+        //判断时间长度是否正确
+        if (date.length()!=14){
+            return null;
+        }
         //根据地理位置信息找到code
         code=this.findCode(province,city,country,town,village);
         if(code==null){
