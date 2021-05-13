@@ -21,6 +21,12 @@ class DemoApplicationTests {
     }
 
     @Test
+    void Test(){
+        String t="2021-04-21 22:16:40";
+        System.out.println(t.length());
+    }
+
+    @Test
     void TestXml(){
         disasterUploadXml("<disasterInfo>\n" +
                 "    <info>\n" +

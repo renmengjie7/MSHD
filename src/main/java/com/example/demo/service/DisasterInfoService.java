@@ -111,7 +111,7 @@ public class DisasterInfoService {
                     String code=chinaAdministrtiveService.doCode(disasterinfo.getProvince(),disasterinfo.getCity(),disasterinfo.getCountry(),
                             disasterinfo.getTown(),disasterinfo.getVillage(),disasterinfo.getDate());
                     if(code==null){
-                        throw new Exception();
+                        jsonObject.put("msg", "some json data is out of standard");
                     }
                     else {
                         disasterinfo.setDId(code);
@@ -210,7 +210,7 @@ public class DisasterInfoService {
                     String code=chinaAdministrtiveService.doCode(disasterinfoEntity.getProvince(),disasterinfoEntity.getCity(),disasterinfoEntity.getCountry(),
                             disasterinfoEntity.getTown(),disasterinfoEntity.getVillage(),disasterinfoEntity.getDate());
                     if(code==null){
-                        throw new Exception();
+                        jsonObject.put("msg", "some json data is out of standard");
                     }
                     else {
                         disasterinfoEntity.setDId(code);
