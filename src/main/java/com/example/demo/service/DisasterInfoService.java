@@ -136,6 +136,7 @@ public class DisasterInfoService {
                     disasterinfos.add(disasterinfo);
                 }
             }
+        }
         return disasterinfos;
     }
 
