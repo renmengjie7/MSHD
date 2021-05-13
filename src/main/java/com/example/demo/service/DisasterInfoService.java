@@ -33,6 +33,8 @@ public class DisasterInfoService {
 
     @Autowired
     private DisasterMapper disasterMapper;
+    @Autowired
+    private ChinaAdministrtiveService chinaAdministrtiveService;
 
     public JSONObject disasterUpload(MultipartFile srcFile){
         JSONObject jsonObject=new JSONObject();
@@ -99,15 +101,22 @@ public class DisasterInfoService {
                     jsonObject.put("msg","some info exist");
                 }
                 else {
-                    int r = disasterMapper.insert(new Disasterinfo(
-                             "", info.getString("province"),
+                    Disasterinfo disasterinfo=new Disasterinfo("", info.getString("province"),
                             info.getString("city"), info.getString("country"),
                             info.getString("town"), info.getString("village"),
                             info.getString("date"), info.getString("location"),
                             Double.parseDouble(info.getString("longitude")), Double.parseDouble(info.getString("latitude")),
                             Float.parseFloat(info.getString("depth")), Float.parseFloat(info.getString("magnitude")),
-                            info.getString("picture"), info.getString("reportingUnit")));
-                    this.encodeDisasterInfo(r);
+                            info.getString("picture"), info.getString("reportingUnit"));
+                    String code=chinaAdministrtiveService.doCode(disasterinfo.getProvince(),disasterinfo.getCity(),disasterinfo.getCountry(),
+                            disasterinfo.getTown(),disasterinfo.getVillage(),disasterinfo.getDate());
+                    if(code==null){
+                        throw new Exception();
+                    }
+                    else {
+                        disasterinfo.setDId(code);
+                        disasterMapper.insert(disasterinfo);
+                    }
                 }
             }
             return jsonObject;
@@ -197,7 +206,16 @@ public class DisasterInfoService {
                     jsonObject.put("msg","some info exist");
                 }
                 else {
-                    disasterMapper.insert(disasterinfoEntity);
+                    //一体化编码
+                    String code=chinaAdministrtiveService.doCode(disasterinfoEntity.getProvince(),disasterinfoEntity.getCity(),disasterinfoEntity.getCountry(),
+                            disasterinfoEntity.getTown(),disasterinfoEntity.getVillage(),disasterinfoEntity.getDate());
+                    if(code==null){
+                        throw new Exception();
+                    }
+                    else {
+                        disasterinfoEntity.setDId(code);
+                        disasterMapper.insert(disasterinfoEntity);
+                    }
                 }
             }
             jsonObject.put("ResultCode", ResultCode.success);
@@ -223,11 +241,6 @@ public class DisasterInfoService {
         dataVO.setCount(result.getTotal());
         dataVO.setData(result.getRecords());
         return dataVO;
-    }
-
-//     根据传入的ID，查询数据库，
-    public Boolean encodeDisasterInfo(int id){
-        return true;
     }
 
     //从数据库中选出未编码的震情
