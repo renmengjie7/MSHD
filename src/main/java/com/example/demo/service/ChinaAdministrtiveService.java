@@ -51,7 +51,7 @@ public class ChinaAdministrtiveService {
         //去除日期中的空格，-和:
         String date_form = date.replaceAll("[[\\s-:punct:]]","");
         //判断时间长度是否正确
-        if (date.length()!=14){
+        if (date_form.length()!=14){
             return null;
         }
         //根据地理位置信息找到code

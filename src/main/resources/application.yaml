@@ -9,4 +9,4 @@ spring:
     prefix: classpath:/templates/
     suffix: .html
 server:
-  port: 80
+  port: 8080

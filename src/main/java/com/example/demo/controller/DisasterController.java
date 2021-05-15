@@ -85,12 +85,23 @@ public class DisasterController {
     @RequestMapping("/addDisasterInfo")
     @ResponseBody
     //增加
-    public JSONObject addDisasterInfo(String province,String city,String country,String town,String village,String date,double longiude,double latitude,float depth,float magnitude,String reportingUnit){
-        return disasterInfoService.addDisasterInfo(province, city, country, town, village, date, longiude, latitude, depth, magnitude, reportingUnit);
+    public JSONObject addDisasterInfo(String province,
+                                      String city,
+                                      String country,
+                                      String town,
+                                      String village,
+                                      String date,
+                                      double longiude,
+                                      double latitude,
+                                      float depth,
+                                      float magnitude,
+                                      String reportingUnit,
+                                      MultipartFile file){
+        return disasterInfoService.addDisasterInfo(province, city, country, town, village, date, longiude, latitude, depth, magnitude, reportingUnit,file);
     }
 
 
-    @RequestMapping("/deleteDisasterInfoById")
+    @DeleteMapping("/deleteDisasterInfoById")
     @ResponseBody
     //删除
     public JSONObject deleteDisasterInfoById(int id){
@@ -101,7 +112,18 @@ public class DisasterController {
     @RequestMapping("/updateDisasterInfoById")
     @ResponseBody
     //修改
-    public JSONObject updateDisasterInfoById(int id,String province,String city,String country,String town,String village,String date,double longiude,double latitude,float depth,float magnitude,String reportingUnit){
+    public JSONObject updateDisasterInfoById(int id,
+                                             String province,
+                                             String city,
+                                             String country,
+                                             String town,
+                                             String village,
+                                             String date,
+                                             double longiude,
+                                             double latitude,
+                                             float depth,
+                                             float magnitude,
+                                             String reportingUnit){
         return disasterInfoService.updateDisasterInfoById(id, province, city, country, town, village, date, longiude, latitude, depth, magnitude, reportingUnit);
     }
 
