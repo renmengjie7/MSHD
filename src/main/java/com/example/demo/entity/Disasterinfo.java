@@ -26,6 +26,24 @@ public class Disasterinfo {
     private String picture;
     private String reportingUnit;
 
+    public Disasterinfo(int id, String dId, String province, String city, String country, String town, String village, String date, String location, double longitude, double latitude, float depth, float magnitude, String picture, String reportingUnit) {
+        this.id = id;
+        this.dId = dId;
+        this.province = province;
+        this.city = city;
+        this.country = country;
+        this.town = town;
+        this.village = village;
+        this.date = date;
+        this.location = location;
+        this.longitude = longitude;
+        this.latitude = latitude;
+        this.depth = depth;
+        this.magnitude = magnitude;
+        this.picture = picture;
+        this.reportingUnit = reportingUnit;
+    }
+
     public Disasterinfo(String dId, String province, String city, String country, String town, String village, String date, String location, double longitude, double latitude, float depth, float magnitude, String picture, String reportingUnit) {
         this.dId = dId;
         this.province = province;

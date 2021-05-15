@@ -2,11 +2,13 @@ package com.example.demo.service;
 
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.example.demo.entity.Disasterinfo;
 import com.example.demo.mapper.DisasterMapper;
+import com.example.demo.utility.MyJSONObject;
 import com.example.demo.utility.ResultCode;
 import com.example.demo.vo.DataVO;
 import net.sf.json.JSONArray;
@@ -261,5 +263,92 @@ public class DisasterInfoService {
     public void setCode(Disasterinfo disaster) {
         disasterMapper.updateById(disaster);
     }
+
+
+    //增加
+    public JSONObject addDisasterInfo(String province,String city,String country,String town,String village,String date,double longiude,double latitude,float depth,float magnitude,String reportingUnit){
+        MyJSONObject myJSONObject=new MyJSONObject();
+        String code = chinaAdministrtiveService.doCode(province, city, country, town, village, date);
+
+        if (code == null) {
+            myJSONObject.putMsg("the location or date is invalid");
+            myJSONObject.putResultCode(ResultCode.invalid);
+            //编码时数据格式不正确
+        } else {
+            try {
+                String location=province+city+country+town+village;
+                String picture="";
+                Disasterinfo disasterinfo=new Disasterinfo(code,province,city,country, town, village, date,location,longiude,latitude,depth,magnitude,picture,reportingUnit);
+                int re=disasterMapper.insert(disasterinfo);
+                myJSONObject.putMsg("add success");
+                myJSONObject.putResultCode(ResultCode.success);
+                JSONObject data=new JSONObject();
+                data.put("id",re);
+                myJSONObject.putData(data);
+            }
+            catch (Exception exception){
+                myJSONObject.putMsg("exception occur");
+                myJSONObject.putResultCode(ResultCode.exception);
+            }
+        }
+        return myJSONObject;
+    }
+
+    //删除
+    public JSONObject deleteDisasterInfoById(int id){
+        MyJSONObject jsonObject=new MyJSONObject();
+
+        UpdateWrapper<Disasterinfo> updateWrapper=Wrappers.update();
+        updateWrapper.eq("id",id);
+        try {
+            int re=disasterMapper.delete(updateWrapper);
+            if(re==0){
+                jsonObject.putResultCode(ResultCode.invalid);
+                jsonObject.putMsg("the id doesn't exist");
+            }
+            else {
+                jsonObject.putMsg("delete success");
+            }
+        }
+        catch (Exception e){
+            e.printStackTrace();
+            jsonObject.putMsg("exception occur");
+            jsonObject.putResultCode(ResultCode.exception);
+        }
+        return jsonObject;
+    }
+
+
+    //修改
+    public JSONObject updateDisasterInfoById(int id,String province,String city,String country,String town,String village,String date,double longiude,double latitude,float depth,float magnitude,String reportingUnit){
+        MyJSONObject myJSONObject=new MyJSONObject();
+        String code = chinaAdministrtiveService.doCode(province, city, country, town, village, date);
+
+        if (code == null) {
+            myJSONObject.putMsg("the location or date is invalid");
+            myJSONObject.putResultCode(ResultCode.invalid);
+            //编码时数据格式不正确
+        } else {
+            try {
+                String location=province+city+country+town+village;
+                String picture="";
+                Disasterinfo disasterinfo=new Disasterinfo(id,code,province,city,country, town, village, date,location,longiude,latitude,depth,magnitude,picture,reportingUnit);
+                UpdateWrapper<Disasterinfo> disasterinfoUpdateWrapper=Wrappers.update();
+                disasterinfoUpdateWrapper.eq("id",id);
+                int re=disasterMapper.update(disasterinfo,disasterinfoUpdateWrapper);
+                myJSONObject.putMsg("update success");
+                myJSONObject.putResultCode(ResultCode.success);
+                JSONObject data=new JSONObject();
+                data.put("id",re);
+                myJSONObject.putData(data);
+            }
+            catch (Exception exception){
+                myJSONObject.putMsg("exception occur");
+                myJSONObject.putResultCode(ResultCode.exception);
+            }
+        }
+        return myJSONObject;
+    }
+
 
 }

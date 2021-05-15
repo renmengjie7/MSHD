@@ -1,9 +1,13 @@
 package com.example.demo.controller;
 
 import com.alibaba.fastjson.JSONObject;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.example.demo.entity.Disasterinfo;
 import com.example.demo.service.ChinaAdministrtiveService;
 import com.example.demo.service.DisasterInfoService;
+import com.example.demo.utility.MyJSONObject;
+import com.example.demo.utility.ResultCode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -11,7 +15,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 @RestController
@@ -79,6 +82,28 @@ public class DisasterController {
     }
 
 
+    @RequestMapping("/addDisasterInfo")
+    @ResponseBody
+    //增加
+    public JSONObject addDisasterInfo(String province,String city,String country,String town,String village,String date,double longiude,double latitude,float depth,float magnitude,String reportingUnit){
+        return disasterInfoService.addDisasterInfo(province, city, country, town, village, date, longiude, latitude, depth, magnitude, reportingUnit);
+    }
+
+
+    @RequestMapping("/deleteDisasterInfoById")
+    @ResponseBody
+    //删除
+    public JSONObject deleteDisasterInfoById(int id){
+        return disasterInfoService.deleteDisasterInfoById(id);
+    }
+
+
+    @RequestMapping("/updateDisasterInfoById")
+    @ResponseBody
+    //修改
+    public JSONObject updateDisasterInfoById(int id,String province,String city,String country,String town,String village,String date,double longiude,double latitude,float depth,float magnitude,String reportingUnit){
+        return disasterInfoService.updateDisasterInfoById(id, province, city, country, town, village, date, longiude, latitude, depth, magnitude, reportingUnit);
+    }
 
 
 }
