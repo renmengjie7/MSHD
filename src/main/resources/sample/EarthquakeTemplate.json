@@ -1,0 +1,86 @@
+{
+  "disasterInfo": {
+    "info": [
+      {
+        "province": "北京",
+        "city": "市辖区",
+        "country": "东城区",
+        "town": "东华门街道",
+        "village": "多福巷社区",
+        "category": "基本震情",
+        "date": "2021-04-21 10:15:57",
+        "location": "北京东城区",
+        "longitude": "116.63",
+        "latitude": "40.16",
+        "depth": "15",
+        "magnitude": "7.0",
+        "reportingUnit": "北京地震局",
+        "picture": "bj4.jpg"
+      },
+      {
+        "province": "北京",
+        "city": "市辖区",
+        "country": "东城区",
+        "town": "东华门街道",
+        "village": "多福巷社区",
+        "category": "基本震情",
+        "date": "2021-04-21 12:15:53",
+        "location": "北京东城区",
+        "longitude": "116.63",
+        "latitude": "40.16",
+        "depth": "13",
+        "magnitude": "6.3",
+        "reportingUnit": "北京地震局",
+        "picture": "bj5.jpg"
+      },
+      {
+        "province": "北京",
+        "city": "市辖区",
+        "country": "东城区",
+        "town": "东华门街道",
+        "village": "多福巷社区",
+        "category": "基本震情",
+        "date": "2021-04-21 13:11:22",
+        "location": "北京东城区",
+        "longitude": "116.63",
+        "latitude": "40.16",
+        "depth": "25",
+        "magnitude": "8.4",
+        "reportingUnit": "北京地震局",
+        "picture": "bj6.jpg"
+      },
+      {
+        "province": "山西",
+        "city": "长治",
+        "country": "潞州区",
+        "town": "西街街道",
+        "village": "",
+        "category": "基本震情",
+        "date": "2021-04-23 19:17:27",
+        "location": "山西省长治市潞州区",
+        "longitude": "113.01",
+        "latitude": "35.50",
+        "depth": "10",
+        "magnitude": "5.5",
+        "reportingUnit": "山西地震局",
+        "picture": "sx4.jpg"
+      },
+      {
+        "province": "山西",
+        "city": "长治",
+        "country": "潞州区",
+        "town": "西街街道",
+        "village": "",
+        "category": "基本震情",
+        "date": "2021-04-22 19:17:27",
+        "location": "山西省长治市潞州区",
+        "longitude": "113.01",
+        "latitude": "35.50",
+        "depth": "17",
+        "magnitude": "7.7",
+        "reportingUnit": "山西地震局",
+        "picture": "sx3.jpg"
+      }
+    ]
+  }
+}

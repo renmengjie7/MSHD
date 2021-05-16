@@ -1,0 +1,82 @@
+<disasterInfo>
+    <info>
+        <province>北京</province>
+        <city>市辖区</city>
+        <country>东城区</country>
+        <town>东华门街道</town>
+        <village>多福巷社区</village>
+        <category>基本震情</category>
+        <date>2021-04-21 10:16:57</date>
+        <location>北京东城区</location>
+        <longitude>116.63</longitude>
+        <latitude>40.16</latitude>
+        <depth>10</depth>
+        <magnitude>2.3</magnitude>
+        <reportingUnit>北京地震局</reportingUnit>
+        <picture>bj1.jpg</picture>
+    </info>
+    <info>
+        <province>北京</province>
+        <city>市辖区</city>
+        <country>东城区</country>
+        <town>东华门街道</town>
+        <village>多福巷社区</village>
+        <category>基本震情</category>
+        <date>2021-04-21 11:17:50</date>
+        <location>北京东城区</location>
+        <longitude>116.63</longitude>
+        <latitude>40.16</latitude>
+        <depth>12</depth>
+        <magnitude>5.3</magnitude>
+        <reportingUnit>北京地震局</reportingUnit>
+        <picture>bj2.jpg</picture>
+    </info>
+    <info>
+        <province>北京</province>
+        <city>市辖区</city>
+        <country>东城区</country>
+        <town>东华门街道</town>
+        <village>多福巷社区</village>
+        <category>基本震情</category>
+        <date>2021-04-21 11:19:52</date>
+        <location>北京东城区</location>
+        <longitude>116.63</longitude>
+        <latitude>40.16</latitude>
+        <depth>15</depth>
+        <magnitude>7.3</magnitude>
+        <reportingUnit>北京地震局</reportingUnit>
+        <picture>bj3.jpg</picture>
+    </info>
+    <info>
+        <province>山西</province>
+        <city>长治市</city>
+        <country>城区</country>
+        <town>西街街道办事处</town>
+        <village>参府社区</village>
+        <category>基本震情</category>
+        <date>2021-04-21 21:16:00</date>
+        <location>山西省长治市城区</location>
+        <longitude>113.01</longitude>
+        <latitude>35.50</latitude>
+        <depth>15</depth>
+        <magnitude>2.5</magnitude>
+        <reportingUnit>山西地震局</reportingUnit>
+        <picture>sx1.jpg</picture>
+    </info>
+    <info>
+        <province>山西</province>
+        <city>长治市</city>
+        <country>城区</country>
+        <town>西街街道办事处</town>
+        <village>参府社区</village>
+        <category>基本震情</category>
+        <date>2021-04-22 19:17:00</date>
+        <location>山西省长治市城区</location>
+        <longitude>113.01</longitude>
+        <latitude>35.50</latitude>
+        <depth>15</depth>
+        <magnitude>2.7</magnitude>
+        <reportingUnit>山西地震局</reportingUnit>
+        <picture>sx2.jpg</picture>
+    </info>
+</disasterInfo>
