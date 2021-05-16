@@ -19,8 +19,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.List;
-
-import static com.example.demo.service.FileOperation.*;
+import java.util.Map;
 
 
 //基本震情上传的微服务
@@ -252,6 +251,26 @@ public class DisasterInfoService {
             }
         }
         return myJSONObject;
+    }
+
+    //统计每年发生的地震次数
+    public  List<Map<String, Object>> countByYear() {
+        QueryWrapper queryWrapper = new QueryWrapper();
+        queryWrapper.select("DATE_FORMAT(date,'%Y') as y,count(*) as count");
+        queryWrapper.groupBy("DATE_FORMAT(date,'%Y')");
+        queryWrapper.orderByAsc("y");
+        List<Map<String, Object>> mapList = disasterMapper.selectMaps(queryWrapper);
+        return mapList;
+    }
+
+    //统计每个省份发生的地震次数
+    public  List<Map<String, Object>> countByProvince() {
+        QueryWrapper queryWrapper = new QueryWrapper();
+        queryWrapper.select("province,count(*) as count");
+        queryWrapper.groupBy("province");
+        queryWrapper.orderByAsc("province");
+        List<Map<String, Object>> mapList = disasterMapper.selectMaps(queryWrapper);
+        return mapList;
     }
 
 
