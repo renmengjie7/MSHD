@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.example.demo.entity.Disasterinfo;
+import com.example.demo.entity.Echarts;
 import com.example.demo.mapper.DisasterMapper;
 import com.example.demo.utility.MyJSONObject;
 import com.example.demo.utility.ResultCode;
@@ -22,6 +23,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URLDecoder;
 import java.util.List;
+import java.util.Map;
 
 import static com.example.demo.utility.FileOperation.*;
 
@@ -102,6 +104,7 @@ public class DisasterInfoService {
         dataVO.setData(result.getRecords());
         return dataVO;
     }
+
 
     //从数据库中选出未编码的震情
     public List<Disasterinfo> getDisasterNotCoded() {
@@ -223,5 +226,27 @@ public class DisasterInfoService {
         }
         return myJSONObject;
     }
+
+    //统计每年发生的地震次数
+    public  List<Map<String, Object>> countByYear() {
+        QueryWrapper queryWrapper = new QueryWrapper();
+        queryWrapper.select("DATE_FORMAT(date,'%Y') as y,count(*) as count");
+        queryWrapper.groupBy("DATE_FORMAT(date,'%Y')");
+        queryWrapper.orderByAsc("y");
+        List<Map<String, Object>> mapList = disasterMapper.selectMaps(queryWrapper);
+        return mapList;
+    }
+
+    //统计每个省份发生的地震次数
+    public  List<Map<String, Object>> countByProvince() {
+        QueryWrapper queryWrapper = new QueryWrapper();
+        queryWrapper.select("province,count(*) as count");
+        queryWrapper.groupBy("province");
+        queryWrapper.orderByAsc("province");
+        List<Map<String, Object>> mapList = disasterMapper.selectMaps(queryWrapper);
+        return mapList;
+    }
+
+
 
 }
