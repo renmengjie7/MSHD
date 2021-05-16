@@ -11,25 +11,26 @@ import com.example.demo.mapper.DisasterMapper;
 import com.example.demo.utility.MyJSONObject;
 import com.example.demo.utility.ResultCode;
 import com.example.demo.vo.DataVO;
-import net.sf.json.JSONArray;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.util.ResourceUtils;
 import org.springframework.web.multipart.MultipartFile;
+
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.net.URLDecoder;
 import java.util.List;
 
-import static com.example.demo.utility.FileOperation.*;
+import static com.example.demo.service.FileOperation.*;
 
 
 //基本震情上传的微服务
 @Service
 public class DisasterInfoService {
 
+    String dirPath = "disaster";
+
+    @Autowired
+    private FileOperation fileOperation;
     @Autowired
     private DisasterMapper disasterMapper;
     @Autowired
@@ -48,14 +49,14 @@ public class DisasterInfoService {
             String line;
             String result = "";
             while ((line = bufferedReader.readLine()) != null) result += line;
-            List<Disasterinfo> disasterinfos=null;
+            List<Disasterinfo> disasterinfos = null;
             String filename = srcFile.getOriginalFilename();
             switch (filename.split("\\.")[1]) {
                 case "json":
-                    disasterinfos=jsonParse(result);
+                    disasterinfos = fileOperation.jsonParse(result);
                     break;
                 case "xml":
-                    disasterinfos=xmlParse(result);
+                    disasterinfos = fileOperation.xmlParse(result);
                     break;
                 default:
                     jsonObject.put("ResultCode", ResultCode.invalid);
@@ -63,25 +64,7 @@ public class DisasterInfoService {
                     jsonObject.put("data", "none");
                     return jsonObject;
             }
-            if (disasterinfos==null){
-                jsonObject.put("ResultCode", ResultCode.exception);
-                jsonObject.put("msg", "data is invalid or exist");
-                jsonObject.put("data", "0");
-            }
-            else if (disasterinfos.size()==0){
-                jsonObject.put("ResultCode", ResultCode.exception);
-                jsonObject.put("msg", "no data");
-                jsonObject.put("data", "0");
-            }
-            else {
-                for (int i=0;i<disasterinfos.size();i++){
-                    disasterMapper.insert(disasterinfos.get(i));
-                }
-                jsonObject.put("ResultCode", ResultCode.success);
-                jsonObject.put("msg", "success");
-                jsonObject.put("data", "0");
-            }
-            return jsonObject;
+            return saveDisasterInfoList(disasterinfos);
         } catch (IOException e) {
             e.printStackTrace();
             jsonObject.put("ResultCode", ResultCode.exception);
@@ -89,6 +72,27 @@ public class DisasterInfoService {
             jsonObject.put("data", "0");
             return jsonObject;
         }
+    }
+
+    public JSONObject saveDisasterInfoList(List<Disasterinfo> disasterinfos){
+        MyJSONObject jsonObject=new MyJSONObject();
+        if (disasterinfos == null) {
+            jsonObject.put("ResultCode", ResultCode.exception);
+            jsonObject.put("msg", "data is invalid or exist");
+            jsonObject.put("data", "0");
+        } else if (disasterinfos.size() == 0) {
+            jsonObject.put("ResultCode", ResultCode.exception);
+            jsonObject.put("msg", "no data");
+            jsonObject.put("data", "0");
+        } else {
+            for (int i = 0; i < disasterinfos.size(); i++) {
+                disasterMapper.insert(disasterinfos.get(i));
+            }
+            jsonObject.put("ResultCode", ResultCode.success);
+            jsonObject.put("msg", "success");
+            jsonObject.put("data", "0");
+        }
+        return jsonObject;
     }
 
     public DataVO<Disasterinfo> getDisaster(String key, Integer page, Integer limit) {
@@ -116,8 +120,10 @@ public class DisasterInfoService {
     }
 
     //增加
-    public JSONObject addDisasterInfo(String province,String city,String country,String town,String village,String date,double longiude,double latitude,float depth,float magnitude,String reportingUnit,MultipartFile file){
-        MyJSONObject myJSONObject=new MyJSONObject();
+    public JSONObject addDisasterInfo(String province, String city, String country, String town, String village,
+                                      String date, double longitude, double latitude, float depth, float magnitude,
+                                      String reportingUnit, MultipartFile file) {
+        MyJSONObject myJSONObject = new MyJSONObject();
         String code = chinaAdministrtiveService.doCode(province, city, country, town, village, date);
         if (code == null) {
             myJSONObject.putMsg("the location or date is invalid");
@@ -125,33 +131,30 @@ public class DisasterInfoService {
             //编码时数据格式不正确
         } else {
             try {
-                String location=province+city+country+town+village;
-                String picture="";
-                Disasterinfo disasterinfo=new Disasterinfo(code,province,city,country, town, village, date,location,longiude,latitude,depth,magnitude,picture,reportingUnit);
-                int re=disasterMapper.insert(disasterinfo);
-                if(re==0){
+                String location = province + city + country + town + village;
+                String picture = "";
+                Disasterinfo disasterinfo = new Disasterinfo(code, province, city, country, town, village, date, location, longitude, latitude, depth, magnitude, picture, reportingUnit);
+                int re = disasterMapper.insert(disasterinfo);
+                if (re == 0) {
                     throw new Exception();
                 }
                 //插入了，那就保存图片
-                String dirPath="disaster";
-                picture="/"+saveImg(file,dirPath,disasterinfo.getId()+"");
-                if(picture==null){
+                picture = "/" + fileOperation.saveImg(file, dirPath, disasterinfo.getId() + "");
+                if (picture == null) {
                     throw new Exception();
-                }
-                else {
+                } else {
                     //存入数据库
-                    disasterinfo.setPicture(picture);
-                    UpdateWrapper<Disasterinfo> disasterinfoUpdateWrapper=Wrappers.update();
-                    disasterinfoUpdateWrapper.eq("id",disasterinfo.getId());
-                    disasterMapper.update(disasterinfo,disasterinfoUpdateWrapper);
+                    disasterinfo.setPicture(picture.split("/disaster/")[1]);
+                    UpdateWrapper<Disasterinfo> disasterinfoUpdateWrapper = Wrappers.update();
+                    disasterinfoUpdateWrapper.eq("id", disasterinfo.getId());
+                    disasterMapper.update(disasterinfo, disasterinfoUpdateWrapper);
                 }
                 myJSONObject.putMsg("add success");
                 myJSONObject.putResultCode(ResultCode.success);
-                JSONObject data=new JSONObject();
-                data.put("id",disasterinfo.getId());
+                JSONObject data = new JSONObject();
+                data.put("id", disasterinfo.getId());
                 myJSONObject.putData(data);
-            }
-            catch (Exception exception){
+            } catch (Exception exception) {
                 myJSONObject.putMsg("exception occur");
                 myJSONObject.putResultCode(ResultCode.exception);
             }
@@ -160,32 +163,26 @@ public class DisasterInfoService {
     }
 
     //删除
-    public JSONObject deleteDisasterInfoById(int id){
-        MyJSONObject jsonObject=new MyJSONObject();
+    public JSONObject deleteDisasterInfoById(int id) {
+        MyJSONObject jsonObject = new MyJSONObject();
 
-        UpdateWrapper<Disasterinfo> updateWrapper=Wrappers.update();
-        updateWrapper.eq("id",id);
-        QueryWrapper<Disasterinfo> queryWrapper=Wrappers.query();
-        queryWrapper.eq("id",id);
+        UpdateWrapper<Disasterinfo> updateWrapper = Wrappers.update();
+        updateWrapper.eq("id", id);
+        QueryWrapper<Disasterinfo> queryWrapper = Wrappers.query();
+        queryWrapper.eq("id", id);
         try {
-            Disasterinfo disasterinfo=disasterMapper.selectOne(queryWrapper);
-            int re=disasterMapper.delete(updateWrapper);
-            //需要删除文件
-            String path= ResourceUtils.getURL("classpath:static").getPath().replaceAll("%20"," ").substring(1).replace('/','\\');
-            path= URLDecoder.decode(path,"UTF-8")+disasterinfo.getPicture();
-            File file=new File(path);
-            if(file.exists()){
-                file.delete();
+            Disasterinfo disasterinfo = disasterMapper.selectOne(queryWrapper);
+            int re = disasterMapper.delete(updateWrapper);
+            if (!fileOperation.deleteImg(disasterinfo.getPicture())) {
+                throw new Exception();
             }
-            if(re==0){
+            if (re == 0) {
                 jsonObject.putResultCode(ResultCode.invalid);
                 jsonObject.putMsg("the id doesn't exist");
-            }
-            else {
+            } else {
                 jsonObject.putMsg("delete success");
             }
-        }
-        catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
             jsonObject.putMsg("exception occur");
             jsonObject.putResultCode(ResultCode.exception);
@@ -193,10 +190,37 @@ public class DisasterInfoService {
         return jsonObject;
     }
 
+
     //修改
-    public JSONObject updateDisasterInfoById(int id,String province,String city,String country,String town,String village,String date,double longiude,double latitude,float depth,float magnitude,String reportingUnit){
-        MyJSONObject myJSONObject=new MyJSONObject();
+    public JSONObject updateDisasterInfoById(int id, String province, String city, String country,
+                                             String town, String village, String date,
+                                             double longitude, double latitude, float depth,
+                                             float magnitude, String reportingUnit, MultipartFile file) {
+        MyJSONObject myJSONObject = new MyJSONObject();
         String code = chinaAdministrtiveService.doCode(province, city, country, town, village, date);
+        String location = province + city + country + town + village;
+        String picture = "";
+        QueryWrapper<Disasterinfo> disasterinfoQueryWrapper = Wrappers.query();
+        disasterinfoQueryWrapper.eq("id", id);
+        Disasterinfo disasterinfo = disasterMapper.selectOne(disasterinfoQueryWrapper);
+        if(disasterinfo==null){
+            myJSONObject.putMsg("id doesn't exist");
+            myJSONObject.putResultCode(ResultCode.invalid);
+            return myJSONObject;
+        }
+        disasterinfo.setProvince(province);
+        disasterinfo.setCity(city);
+        disasterinfo.setCountry(country);
+        disasterinfo.setTown(town);
+        disasterinfo.setVillage(village);
+        disasterinfo.setDate(date);
+        disasterinfo.setLongitude(longitude);
+        disasterinfo.setLatitude(latitude);
+        disasterinfo.setDepth(depth);
+        disasterinfo.setMagnitude(magnitude);
+        disasterinfo.setReportingUnit(reportingUnit);
+        disasterinfo.setLocation(location);
+        disasterinfo.setDId(code);
 
         if (code == null) {
             myJSONObject.putMsg("the location or date is invalid");
@@ -204,24 +228,31 @@ public class DisasterInfoService {
             //编码时数据格式不正确
         } else {
             try {
-                String location=province+city+country+town+village;
-                String picture="";
-                Disasterinfo disasterinfo=new Disasterinfo(id,code,province,city,country, town, village, date,location,longiude,latitude,depth,magnitude,picture,reportingUnit);
-                UpdateWrapper<Disasterinfo> disasterinfoUpdateWrapper=Wrappers.update();
-                disasterinfoUpdateWrapper.eq("id",id);
-                int re=disasterMapper.update(disasterinfo,disasterinfoUpdateWrapper);
-                if(re==0){
+                if (!file.isEmpty()) {
+                    //删除原来的文件，保存现在的文件
+                    fileOperation.deleteImg(disasterinfo.getPicture());
+                    picture = "/" + fileOperation.saveImg(file, dirPath, disasterinfo.getId() + "");
+                    if (picture == null) {
+                        throw new Exception();
+                    }
+                    disasterinfo.setPicture(picture.split("/disaster/")[1]);
+                }
+
+                UpdateWrapper<Disasterinfo> disasterinfoUpdateWrapper = Wrappers.update();
+                disasterinfoUpdateWrapper.eq("id", disasterinfo.getId());
+                int re = disasterMapper.update(disasterinfo, disasterinfoUpdateWrapper);
+                if (re == 0) {
                     throw new Exception();
                 }
                 myJSONObject.putMsg("update success");
                 myJSONObject.putResultCode(ResultCode.success);
-            }
-            catch (Exception exception){
+            } catch (Exception exception) {
                 myJSONObject.putMsg("exception occur");
                 myJSONObject.putResultCode(ResultCode.exception);
             }
         }
         return myJSONObject;
     }
+
 
 }

@@ -1,13 +1,9 @@
 package com.example.demo.controller;
 
 import com.alibaba.fastjson.JSONObject;
-import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
-import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.example.demo.entity.Disasterinfo;
 import com.example.demo.service.ChinaAdministrtiveService;
 import com.example.demo.service.DisasterInfoService;
-import com.example.demo.utility.MyJSONObject;
-import com.example.demo.utility.ResultCode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -123,8 +119,9 @@ public class DisasterController {
                                              double latitude,
                                              float depth,
                                              float magnitude,
-                                             String reportingUnit){
-        return disasterInfoService.updateDisasterInfoById(id, province, city, country, town, village, date, longiude, latitude, depth, magnitude, reportingUnit);
+                                             String reportingUnit,
+                                             MultipartFile file){
+        return disasterInfoService.updateDisasterInfoById(id, province, city, country, town, village, date, longiude, latitude, depth, magnitude, reportingUnit,file);
     }
 
 

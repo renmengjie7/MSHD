@@ -1,4 +1,4 @@
-package com.example.demo.utility;
+package com.example.demo.service;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
@@ -7,6 +7,7 @@ import com.example.demo.mapper.DisasterMapper;
 import com.example.demo.service.ChinaAdministrtiveService;
 import net.sf.json.JSONArray;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import org.springframework.util.ResourceUtils;
 import org.springframework.web.multipart.MultipartFile;
 import org.w3c.dom.Document;
@@ -17,6 +18,7 @@ import org.xml.sax.InputSource;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.StringReader;
 import java.net.URLDecoder;
@@ -27,20 +29,37 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+@Service
 public class FileOperation {
 
     @Autowired
-    static DisasterMapper disasterMapper;
+    private DisasterMapper disasterMapper;
     @Autowired
-    static ChinaAdministrtiveService chinaAdministrtiveService;
+    private ChinaAdministrtiveService chinaAdministrtiveService;
+
+    public Boolean deleteImg(String img){
+        //需要删除文件
+        String path= null;
+        try {
+            path = ResourceUtils.getURL("classpath:static").getPath().replaceAll("%20"," ").substring(1).replace('/','\\');
+            path= URLDecoder.decode(path,"UTF-8")+img;
+            File file=new File(path);
+            if(file.exists()){
+                file.delete();
+            }
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
 
     //保存文件
-    public static String saveImg(MultipartFile file,String dirPath,String filename){
+    public String saveImg(MultipartFile file,String dirPath,String filename){
         //前端没有选择文件，srcFile为空
         if (file.isEmpty()) {
             return null;
         }
-        System.out.println(file.getOriginalFilename());
         String[] ttt=file.getOriginalFilename().split("\\.");
         //选择了文件，开始上传操作z
         String suffixName;
@@ -58,7 +77,6 @@ public class FileOperation {
             //拼接上传路径
             //通过项目路径，拼接上传路径
             Path path = Paths.get(upload.getAbsolutePath() + "/" + filename+"."+ttt[ttt.length-1]);
-            System.out.println(path);
             //** 开始将源文件写入目标地址
             Files.write(path, bytes);
             String uuid = UUID.randomUUID().toString().replaceAll("-", "");
@@ -74,7 +92,7 @@ public class FileOperation {
         return dirPath+"/"+filename+"."+suffixName;
     }
 
-    public static List<Disasterinfo> jsonParse(String content) {
+    public List<Disasterinfo> jsonParse(String content) {
         List<Disasterinfo> disasterinfos = new ArrayList<>();
         //逻辑处理，存入数据库，需要判断是否重复
         org.json.JSONObject data = new org.json.JSONObject(content);
@@ -82,10 +100,10 @@ public class FileOperation {
         JSONArray infos = JSONArray.fromObject(disasterInfo.get("info").toString());
         for (int i = 0; i < infos.size(); i++) {
             org.json.JSONObject info = new org.json.JSONObject(infos.get(i).toString());
-            if (existDisasterInfo(info.getString("date"), info.getString("longitude"), info.getString("latitude"))) {
-                //相同的数据已经出现过了
-                return null;
-            } else {
+//            if (existDisasterInfo(info.getString("date"), info.getString("longitude"), info.getString("latitude"))) {
+//                //相同的数据已经出现过了
+//                return null;
+//            } else {
                 Disasterinfo disasterinfo = new Disasterinfo("", info.getString("province"),
                         info.getString("city"), info.getString("country"),
                         info.getString("town"), info.getString("village"),
@@ -103,11 +121,11 @@ public class FileOperation {
                     disasterinfos.add(disasterinfo);
                 }
             }
-        }
+//        }
         return disasterinfos;
     }
 
-    public static List<Disasterinfo> xmlParse(String content) {
+    public List<Disasterinfo> xmlParse(String content) {
         List<Disasterinfo> disasterinfos = new ArrayList<>();
 
         StringReader sr = new StringReader(content);
@@ -203,7 +221,7 @@ public class FileOperation {
     }
 
     //如果数据出现经纬度、时间一样的情况，就不插入
-    public static Boolean existDisasterInfo(String date, String longitude, String latitude) {
+    public Boolean existDisasterInfo(String date, String longitude, String latitude) {
         QueryWrapper<Disasterinfo> queryWrapper = Wrappers.query();
         queryWrapper.eq("date", date);
         queryWrapper.eq("longitude", longitude);

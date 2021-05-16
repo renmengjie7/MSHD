@@ -2,7 +2,9 @@ package com.example.demo;
 
 import com.alibaba.fastjson.JSONObject;
 import com.example.demo.entity.Disasterinfo;
+import com.example.demo.service.FTPService;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -11,19 +13,22 @@ import org.xml.sax.InputSource;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import java.io.IOException;
 import java.io.StringReader;
 
 @SpringBootTest
 class DemoApplicationTests {
+    @Autowired
+    private FTPService ftpService;
 
     @Test
     void contextLoads() {
     }
 
     @Test
-    void Test(){
-        String t="2021-04-21 22:16:40";
-        System.out.println(t.length());
+    void Test() throws IOException {
+        System.out.println("---------------------");
+        ftpService.ftpConfig("47.93.218.244","ftpuser","123");
     }
 
     @Test
