@@ -2,16 +2,19 @@ package com.example.demo.controller;
 
 import com.alibaba.fastjson.JSONObject;
 import com.example.demo.entity.Disasterinfo;
+import com.example.demo.entity.Echarts;
 import com.example.demo.service.ChinaAdministrtiveService;
 import com.example.demo.service.DisasterInfoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 public class DisasterController {
@@ -37,7 +40,6 @@ public class DisasterController {
                                          @RequestParam("limit")Integer limit){
         return new ResponseEntity<>(disasterInfoService.getDisaster(key,page,limit), HttpStatus.OK);
     }
-
 
     //从数据库中读取位置信息
     @GetMapping("/code")
@@ -77,6 +79,29 @@ public class DisasterController {
 
     }
 
+    //按照年份划分计数
+    @RequestMapping("/yearCount")
+    @ResponseBody
+    public List<Echarts> yearCount(Model model) {
+        List<Map<String, Object>> mapList=disasterInfoService.countByYear();
+        List<Echarts> list = new ArrayList<Echarts>();
+        for (Map<String, Object> map : mapList) {
+            list.add(new Echarts((String) map.get("y"),((Long)map.get("count")).intValue()));
+        }
+        return list;
+    }
+
+    //按照省份划分计数
+    @RequestMapping("/provinceCount")
+    @ResponseBody
+    public List<Echarts> provinceCount(Model model) {
+        List<Map<String, Object>> mapList=disasterInfoService.countByProvince();
+        List<Echarts> list = new ArrayList<Echarts>();
+        for (Map<String, Object> map : mapList) {
+            list.add(new Echarts((String) map.get("province"),((Long)map.get("count")).intValue()));
+        }
+        return list;
+    }
 
     @RequestMapping("/addDisasterInfo")
     @ResponseBody
