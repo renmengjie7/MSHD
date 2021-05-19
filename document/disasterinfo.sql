@@ -9,7 +9,7 @@ create table softwaremanage.disasterinfo
     country        varchar(255) null,
     town           varchar(255) null,
     village        varchar(255) null,
-    date           varchar(255) null,
+    date           datetime     null,
     location       varchar(100) null,
     longitude      double(5, 2) null,
     latitude       double(4, 2) null,

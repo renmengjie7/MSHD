@@ -5,6 +5,8 @@ import com.example.demo.entity.Disasterinfo;
 import com.example.demo.entity.Echarts;
 import com.example.demo.service.ChinaAdministrtiveService;
 import com.example.demo.service.DisasterInfoService;
+import com.example.demo.utility.MyJSONObject;
+import com.example.demo.utility.ResultCode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,6 +14,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -25,6 +28,25 @@ public class DisasterController {
     private ChinaAdministrtiveService chinaAdministrtiveService;
 
     List<Disasterinfo> disasters=new ArrayList<>();
+
+    @RequestMapping("/MapData")
+    @ResponseBody
+    public JSONObject MapData(String startDate,String endDate) {
+        MyJSONObject myJSONObject=new MyJSONObject();
+        Timestamp start;
+        Timestamp end;
+        try {
+            start=Timestamp.valueOf(startDate);
+            end= Timestamp.valueOf(endDate);
+        }
+        catch (Exception exception){
+            myJSONObject.putMsg("Timestamp format must be yyyy-mm-dd hh:mm:ss[.fffffffff]");
+            myJSONObject.putResultCode(ResultCode.invalid);
+            return myJSONObject;
+        }
+        return disasterInfoService.MapData(start,end);
+    }
+
 
     @RequestMapping("/disasterUpload")
     @ResponseBody
@@ -57,7 +79,7 @@ public class DisasterController {
             country=disaster.getCountry();
             town= disaster.getTown();
             village=disaster.getVillage();
-            date=disaster.getDate();
+            date=disaster.getDate().toString();
             if(date==null) {
                 date_form="00000000000000";
                 System.out.println("\n时间信息为空\n");
@@ -112,13 +134,13 @@ public class DisasterController {
                                       String town,
                                       String village,
                                       String date,
-                                      double longiude,
+                                      double longitude,
                                       double latitude,
                                       float depth,
                                       float magnitude,
                                       String reportingUnit,
                                       MultipartFile file){
-        return disasterInfoService.addDisasterInfo(province, city, country, town, village, date, longiude, latitude, depth, magnitude, reportingUnit,file);
+        return disasterInfoService.addDisasterInfo(province, city, country, town, village, date, longitude, latitude, depth, magnitude, reportingUnit,file);
     }
 
 
@@ -140,13 +162,13 @@ public class DisasterController {
                                              String town,
                                              String village,
                                              String date,
-                                             double longiude,
+                                             double longitude,
                                              double latitude,
                                              float depth,
                                              float magnitude,
                                              String reportingUnit,
                                              MultipartFile file){
-        return disasterInfoService.updateDisasterInfoById(id, province, city, country, town, village, date, longiude, latitude, depth, magnitude, reportingUnit,file);
+        return disasterInfoService.updateDisasterInfoById(id, province, city, country, town, village, date, longitude, latitude, depth, magnitude, reportingUnit,file);
     }
 
 

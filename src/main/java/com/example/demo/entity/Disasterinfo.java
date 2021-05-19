@@ -4,6 +4,8 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import lombok.*;
 
+import java.sql.Timestamp;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -17,7 +19,7 @@ public class Disasterinfo {
     private String country;
     private String town;
     private String village;
-    private String date;
+    private Timestamp date;
     private String location;
     private double longitude;
     private double latitude;
@@ -26,7 +28,7 @@ public class Disasterinfo {
     private String picture;
     private String reportingUnit;
 
-    public Disasterinfo(int id, String dId, String province, String city, String country, String town, String village, String date, String location, double longitude, double latitude, float depth, float magnitude, String picture, String reportingUnit) {
+    public Disasterinfo(int id, String dId, String province, String city, String country, String town, String village, Timestamp date, String location, double longitude, double latitude, float depth, float magnitude, String picture, String reportingUnit) {
         this.id = id;
         this.dId = dId;
         this.province = province;
@@ -44,7 +46,7 @@ public class Disasterinfo {
         this.reportingUnit = reportingUnit;
     }
 
-    public Disasterinfo(String dId, String province, String city, String country, String town, String village, String date, String location, double longitude, double latitude, float depth, float magnitude, String picture, String reportingUnit) {
+    public Disasterinfo(String dId, String province, String city, String country, String town, String village, Timestamp date, String location, double longitude, double latitude, float depth, float magnitude, String picture, String reportingUnit) {
         this.dId = dId;
         this.province = province;
         this.city = city;

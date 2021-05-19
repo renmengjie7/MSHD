@@ -25,6 +25,8 @@ import java.net.URLDecoder;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.sql.Time;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -107,12 +109,12 @@ public class FileOperation {
                 Disasterinfo disasterinfo = new Disasterinfo("", info.getString("province"),
                         info.getString("city"), info.getString("country"),
                         info.getString("town"), info.getString("village"),
-                        info.getString("date"), info.getString("location"),
+                        Timestamp.valueOf(info.getString("date")), info.getString("location"),
                         Double.parseDouble(info.getString("longitude")), Double.parseDouble(info.getString("latitude")),
                         Float.parseFloat(info.getString("depth")), Float.parseFloat(info.getString("magnitude")),
                         info.getString("picture"), info.getString("reportingUnit"));
                 String code = chinaAdministrtiveService.doCode(disasterinfo.getProvince(), disasterinfo.getCity(), disasterinfo.getCountry(),
-                        disasterinfo.getTown(), disasterinfo.getVillage(), disasterinfo.getDate());
+                        disasterinfo.getTown(), disasterinfo.getVillage(), disasterinfo.getDate().toString());
                 if (code == null) {
                     //编码时数据格式不正确
                     return null;
@@ -168,7 +170,7 @@ public class FileOperation {
                                 disasterinfoEntity.setVillage(temp);
                                 break;
                             case "date":
-                                disasterinfoEntity.setDate(temp);
+                                disasterinfoEntity.setDate(Timestamp.valueOf(temp));
                                 break;
                             case "location":
                                 disasterinfoEntity.setLocation(temp);
@@ -196,13 +198,13 @@ public class FileOperation {
                         }
                     }
                 }
-                if (existDisasterInfo(disasterinfoEntity.getDate(), disasterinfoEntity.getLongitude() + "", disasterinfoEntity.getLatitude() + "")) {
+                if (existDisasterInfo(disasterinfoEntity.getDate().toString(), disasterinfoEntity.getLongitude() + "", disasterinfoEntity.getLatitude() + "")) {
                     //信息已经存在
                     return null;
                 } else {
                     //一体化编码
                     String code = chinaAdministrtiveService.doCode(disasterinfoEntity.getProvince(), disasterinfoEntity.getCity(), disasterinfoEntity.getCountry(),
-                            disasterinfoEntity.getTown(), disasterinfoEntity.getVillage(), disasterinfoEntity.getDate());
+                            disasterinfoEntity.getTown(), disasterinfoEntity.getVillage(), disasterinfoEntity.getDate().toString());
                     if (code == null) {
                         //一体化编码出错
                         return null;

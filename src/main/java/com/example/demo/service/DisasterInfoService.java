@@ -8,6 +8,7 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.example.demo.entity.Disasterinfo;
 import com.example.demo.mapper.DisasterMapper;
+import com.example.demo.utility.DateCount;
 import com.example.demo.utility.MyJSONObject;
 import com.example.demo.utility.ResultCode;
 import com.example.demo.vo.DataVO;
@@ -18,6 +19,9 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.sql.Timestamp;
+import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -34,6 +38,44 @@ public class DisasterInfoService {
     private DisasterMapper disasterMapper;
     @Autowired
     private ChinaAdministrtiveService chinaAdministrtiveService;
+
+    //    地图数据
+    public JSONObject MapData(Timestamp startDate, Timestamp endDate) {
+        MyJSONObject myJSONObject=new MyJSONObject();
+        QueryWrapper<Disasterinfo> disasterinfoQueryWrapper=Wrappers.query();
+        disasterinfoQueryWrapper.between("date", startDate, endDate);
+        List<Disasterinfo> disasterinfos=disasterMapper.selectList(disasterinfoQueryWrapper);
+//        处理一下数据
+        JSONObject data=new JSONObject();
+        JSONObject coordinate=new JSONObject();
+        List infos=new ArrayList();
+
+        for (Disasterinfo disasterinfo:disasterinfos) {
+            if (!coordinate.containsKey(disasterinfo.getLocation())){
+                coordinate.put(disasterinfo.getLocation(),new double[]{disasterinfo.getLatitude(),disasterinfo.getLongitude()});
+                JSONObject jsonObject=new JSONObject();
+                jsonObject.put("name",disasterinfo.getLocation());
+                jsonObject.put("longitude",disasterinfo.getLongitude());
+                jsonObject.put("latitude",disasterinfo.getLatitude());
+                jsonObject.put("depth",disasterinfo.getDepth());
+                jsonObject.put("magnitude",disasterinfo.getMagnitude());
+                try {
+                    jsonObject.put("value", DateCount.getDayDiffer(disasterinfo.getDate(),endDate));
+                }
+                catch (Exception exception){
+                    myJSONObject.putMsg("Timestamp format must be yyyy-mm-dd hh:mm:ss[.fffffffff]");
+                    myJSONObject.putResultCode(ResultCode.invalid);
+                    break;
+                }
+                infos.add(jsonObject);
+            }
+        }
+        data.put("coordinate",coordinate);
+        data.put("info",infos);
+        myJSONObject.putData(data);
+//        System.out.println(myJSONObject.toString());
+        return myJSONObject;
+    }
 
     public JSONObject disasterUpload(MultipartFile srcFile) {
         JSONObject jsonObject = new JSONObject();
@@ -132,7 +174,7 @@ public class DisasterInfoService {
             try {
                 String location = province + city + country + town + village;
                 String picture = "";
-                Disasterinfo disasterinfo = new Disasterinfo(code, province, city, country, town, village, date, location, longitude, latitude, depth, magnitude, picture, reportingUnit);
+                Disasterinfo disasterinfo = new Disasterinfo(code, province, city, country, town, village, Timestamp.valueOf(date), location, longitude, latitude, depth, magnitude, picture, reportingUnit);
                 int re = disasterMapper.insert(disasterinfo);
                 if (re == 0) {
                     throw new Exception();
@@ -212,7 +254,7 @@ public class DisasterInfoService {
         disasterinfo.setCountry(country);
         disasterinfo.setTown(town);
         disasterinfo.setVillage(village);
-        disasterinfo.setDate(date);
+        disasterinfo.setDate(Timestamp.valueOf(date));
         disasterinfo.setLongitude(longitude);
         disasterinfo.setLatitude(latitude);
         disasterinfo.setDepth(depth);
@@ -273,5 +315,6 @@ public class DisasterInfoService {
         return mapList;
     }
 
-
 }
+
+
