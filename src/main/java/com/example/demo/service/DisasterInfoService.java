@@ -12,6 +12,8 @@ import com.example.demo.utility.DateCount;
 import com.example.demo.utility.MyJSONObject;
 import com.example.demo.utility.ResultCode;
 import com.example.demo.vo.DataVO;
+import com.example.demo.vo.DisasterVO;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -20,7 +22,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.sql.Timestamp;
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -39,7 +40,7 @@ public class DisasterInfoService {
     @Autowired
     private ChinaAdministrtiveService chinaAdministrtiveService;
 
-    //    地图数据
+    //地图数据
     public JSONObject MapData(Timestamp startDate, Timestamp endDate) {
         MyJSONObject myJSONObject=new MyJSONObject();
         QueryWrapper<Disasterinfo> disasterinfoQueryWrapper=Wrappers.query();
@@ -53,12 +54,14 @@ public class DisasterInfoService {
         for (Disasterinfo disasterinfo:disasterinfos) {
             if (!coordinate.containsKey(disasterinfo.getLocation())){
                 coordinate.put(disasterinfo.getLocation(),new double[]{disasterinfo.getLatitude(),disasterinfo.getLongitude()});
+
                 JSONObject jsonObject=new JSONObject();
                 jsonObject.put("name",disasterinfo.getLocation());
                 jsonObject.put("longitude",disasterinfo.getLongitude());
                 jsonObject.put("latitude",disasterinfo.getLatitude());
                 jsonObject.put("depth",disasterinfo.getDepth());
                 jsonObject.put("magnitude",disasterinfo.getMagnitude());
+
                 try {
                     jsonObject.put("value", DateCount.getDayDiffer(disasterinfo.getDate(),endDate));
                 }
@@ -73,7 +76,6 @@ public class DisasterInfoService {
         data.put("coordinate",coordinate);
         data.put("info",infos);
         myJSONObject.putData(data);
-//        System.out.println(myJSONObject.toString());
         return myJSONObject;
     }
 
@@ -141,10 +143,21 @@ public class DisasterInfoService {
         dataVO.setCode(0);
         dataVO.setMsg("");
         QueryWrapper<Disasterinfo> queryWrapper = Wrappers.query();
+        queryWrapper.like("location",key)
+                .or(wrapper -> wrapper.like("id", key));
         IPage<Disasterinfo> disasterinfoIPage = new Page<>(page, limit);
         IPage<Disasterinfo> result = disasterMapper.selectPage(disasterinfoIPage, queryWrapper);
         dataVO.setCount(result.getTotal());
-        dataVO.setData(result.getRecords());
+
+        List<DisasterVO> disasterVOList=new ArrayList<>();
+        //对记录数据进行处理，时间
+        for (Disasterinfo disaster: result.getRecords()) {
+            DisasterVO disasterVO=new DisasterVO();
+            BeanUtils.copyProperties(disaster,disasterVO);
+            disasterVO.setDate(disaster.getDate().toString().substring(0,"2021-04-21 18:15:57".length()));
+            disasterVOList.add(disasterVO);
+        }
+        dataVO.setData(disasterVOList);
         return dataVO;
     }
 

@@ -8,6 +8,7 @@ import com.example.demo.service.ChinaAdministrtiveService;
 import net.sf.json.JSONArray;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.ClassUtils;
 import org.springframework.util.ResourceUtils;
 import org.springframework.web.multipart.MultipartFile;
 import org.w3c.dom.Document;
@@ -67,9 +68,14 @@ public class FileOperation {
         String suffixName;
         try {
             //拼接子路径
-            String directory= ResourceUtils.getURL("classpath:static").getPath().replaceAll("%20"," ").substring(1).replace('/','\\');
+
+            System.out.println("test----------"+ClassUtils.getDefaultClassLoader().getResource("static").getPath());
+            String directory= ResourceUtils.getURL("classpath:static").getPath().replace("!","");
+//            String directory= ResourceUtils.getURL("classpath:static").getPath().replaceAll("%20"," ").substring(1).replace('/','\\');
+            System.out.println("directory--------------"+directory);
+            System.out.println("dirPath--------------"+dirPath);
             directory= URLDecoder.decode(directory,"UTF-8");
-            File upload = new File(directory,dirPath);
+            File upload = new File("test.jar/BOOT-INF/classes/static",dirPath);
             //若目标文件夹不存在，则创建
             if (!upload.exists()) {
                 upload.mkdirs();
@@ -78,10 +84,10 @@ public class FileOperation {
             byte[] bytes = file.getBytes();
             //拼接上传路径
             //通过项目路径，拼接上传路径
-            Path path = Paths.get(upload.getAbsolutePath() + "/" + filename+"."+ttt[ttt.length-1]);
+            Path path = Paths.get(upload.getAbsolutePath() + "\\" + filename+"."+ttt[ttt.length-1]);
+            System.out.println("path--------------"+path.toString());
             //** 开始将源文件写入目标地址
             Files.write(path, bytes);
-            String uuid = UUID.randomUUID().toString().replaceAll("-", "");
             // 获得文件原始名称
             String fileName = file.getOriginalFilename();
             // 获得文件后缀名称
