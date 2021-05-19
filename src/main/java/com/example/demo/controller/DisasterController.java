@@ -106,7 +106,7 @@ public class DisasterController {
     //按照年份划分计数
     @RequestMapping("/yearCount")
     @ResponseBody
-    public List<Echarts> yearCount(Model model) {
+    public List<Echarts> yearCount() {
         List<Map<String, Object>> mapList=disasterInfoService.countByYear();
         List<Echarts> list = new ArrayList<Echarts>();
         for (Map<String, Object> map : mapList) {
@@ -118,7 +118,7 @@ public class DisasterController {
     //按照省份划分计数
     @RequestMapping("/provinceCount")
     @ResponseBody
-    public List<Echarts> provinceCount(Model model) {
+    public List<Echarts> provinceCount() {
         List<Map<String, Object>> mapList=disasterInfoService.countByProvince();
         List<Echarts> list = new ArrayList<Echarts>();
         for (Map<String, Object> map : mapList) {
