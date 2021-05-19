@@ -21,6 +21,7 @@ import java.util.Map;
 
 @RestController
 public class DisasterController {
+
     @Autowired
     private DisasterInfoService disasterInfoService;
 
@@ -28,6 +29,7 @@ public class DisasterController {
     private ChinaAdministrtiveService chinaAdministrtiveService;
 
     List<Disasterinfo> disasters=new ArrayList<>();
+
 
     @RequestMapping("/MapData")
     @ResponseBody
@@ -168,6 +170,7 @@ public class DisasterController {
                                              float magnitude,
                                              String reportingUnit,
                                              MultipartFile file){
+        System.out.println(file);
         return disasterInfoService.updateDisasterInfoById(id, province, city, country, town, village, date, longitude, latitude, depth, magnitude, reportingUnit,file);
     }
 

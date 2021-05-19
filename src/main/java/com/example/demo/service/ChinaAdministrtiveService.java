@@ -53,6 +53,7 @@ public class ChinaAdministrtiveService {
         String date_form = date.replaceAll("[[\\s-:punct:]]","");
         //判断时间长度是否正确
         if (date_form.length()!=14){
+            System.out.println("时间不对");
             return null;
         }
         //根据地理位置信息找到code

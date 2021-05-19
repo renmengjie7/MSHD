@@ -269,7 +269,7 @@ public class DisasterInfoService {
             //编码时数据格式不正确
         } else {
             try {
-                if (!file.isEmpty()) {
+                if (file!=null&&!file.isEmpty()) {
                     //删除原来的文件，保存现在的文件
                     fileOperation.deleteImg(disasterinfo.getPicture());
                     picture = "/" + fileOperation.saveImg(file, dirPath, disasterinfo.getId() + "");
@@ -283,11 +283,13 @@ public class DisasterInfoService {
                 disasterinfoUpdateWrapper.eq("id", disasterinfo.getId());
                 int re = disasterMapper.update(disasterinfo, disasterinfoUpdateWrapper);
                 if (re == 0) {
+                    System.out.println("re为0");
                     throw new Exception();
                 }
                 myJSONObject.putMsg("update success");
                 myJSONObject.putResultCode(ResultCode.success);
             } catch (Exception exception) {
+                exception.printStackTrace();
                 myJSONObject.putMsg("exception occur");
                 myJSONObject.putResultCode(ResultCode.exception);
             }

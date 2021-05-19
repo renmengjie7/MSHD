@@ -114,9 +114,10 @@ public class FileOperation {
                         Float.parseFloat(info.getString("depth")), Float.parseFloat(info.getString("magnitude")),
                         info.getString("picture"), info.getString("reportingUnit"));
                 String code = chinaAdministrtiveService.doCode(disasterinfo.getProvince(), disasterinfo.getCity(), disasterinfo.getCountry(),
-                        disasterinfo.getTown(), disasterinfo.getVillage(), disasterinfo.getDate().toString());
+                        disasterinfo.getTown(), disasterinfo.getVillage(), info.getString("date"));
                 if (code == null) {
                     //编码时数据格式不正确
+                    System.out.println("编码时数据格式不正确");
                     return null;
                 } else {
                     disasterinfo.setDId(code);

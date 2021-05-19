@@ -57,7 +57,7 @@ public class FTPService {
         ftp = ftpInterface.ftp(ip, user, passwd);//这里是ip，用户名，密码
         if (null != ftp) {
             try {
-                //这便是设置编码的
+                //这边是设置被动服务
                 ftp.enterLocalPassiveMode();
                 if (FTPReply.isPositiveCompletion(ftp.sendCommand(
                         "OPTS UTF8", "ON"))) {// 开启服务器对UTF-8的支持，如果服务器支持就用UTF-8编码，否则就使用本地编码（GBK）.
@@ -93,7 +93,6 @@ public class FTPService {
             String result = "";
             while ((line = bufferedReader.readLine()) != null) result += line;
             List<Disasterinfo> disasterinfos = fileOperation.jsonParse(result);
-
             if (disasterinfos == null) {
                 jsonObject.put("ResultCode", ResultCode.exception);
                 jsonObject.put("msg", "connect success, but data is invalid or exist");

@@ -27,6 +27,9 @@ public class FTPController {
     @RequestMapping("/ftpConfig")
     @ResponseBody
     public JSONObject ftpConfig(String ip,String user,String passwd){
+        System.out.println(ip);
+        System.out.println(user);
+        System.out.println(passwd);
         return ftpService.ftpConfig(ip, user, passwd);
     }
 
