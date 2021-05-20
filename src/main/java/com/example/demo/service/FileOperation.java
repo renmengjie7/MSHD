@@ -18,10 +18,7 @@ import org.xml.sax.InputSource;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.StringReader;
+import java.io.*;
 import java.net.URLDecoder;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -35,6 +32,8 @@ import java.util.UUID;
 @Service
 public class FileOperation {
 
+    String mainPath="static/";
+
     @Autowired
     private DisasterMapper disasterMapper;
     @Autowired
@@ -44,8 +43,7 @@ public class FileOperation {
         //需要删除文件
         String path= null;
         try {
-            path = ResourceUtils.getURL("classpath:static").getPath().replaceAll("%20"," ").substring(1).replace('/','\\');
-            path= URLDecoder.decode(path,"UTF-8")+img;
+            path= mainPath+img;
             File file=new File(path);
             if(file.exists()){
                 file.delete();
@@ -59,6 +57,7 @@ public class FileOperation {
 
     //保存文件
     public String saveImg(MultipartFile file,String dirPath,String filename){
+        System.out.println("存图片");
         //前端没有选择文件，srcFile为空
         if (file.isEmpty()) {
             return null;
@@ -68,14 +67,7 @@ public class FileOperation {
         String suffixName;
         try {
             //拼接子路径
-
-            System.out.println("test----------"+ClassUtils.getDefaultClassLoader().getResource("static").getPath());
-            String directory= ResourceUtils.getURL("classpath:static").getPath().replace("!","");
-//            String directory= ResourceUtils.getURL("classpath:static").getPath().replaceAll("%20"," ").substring(1).replace('/','\\');
-            System.out.println("directory--------------"+directory);
-            System.out.println("dirPath--------------"+dirPath);
-            directory= URLDecoder.decode(directory,"UTF-8");
-            File upload = new File("test.jar/BOOT-INF/classes/static",dirPath);
+            File upload = new File(mainPath,dirPath);
             //若目标文件夹不存在，则创建
             if (!upload.exists()) {
                 upload.mkdirs();
@@ -84,8 +76,7 @@ public class FileOperation {
             byte[] bytes = file.getBytes();
             //拼接上传路径
             //通过项目路径，拼接上传路径
-            Path path = Paths.get(upload.getAbsolutePath() + "\\" + filename+"."+ttt[ttt.length-1]);
-            System.out.println("path--------------"+path.toString());
+            Path path = Paths.get(upload.getAbsolutePath() + "/" + filename+"."+ttt[ttt.length-1]);
             //** 开始将源文件写入目标地址
             Files.write(path, bytes);
             // 获得文件原始名称

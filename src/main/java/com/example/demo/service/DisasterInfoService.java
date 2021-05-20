@@ -198,7 +198,7 @@ public class DisasterInfoService {
                     throw new Exception();
                 } else {
                     //存入数据库
-                    disasterinfo.setPicture(picture.split("/disaster/")[1]);
+                    disasterinfo.setPicture(picture.split("/"+dirPath+"/")[1]);
                     UpdateWrapper<Disasterinfo> disasterinfoUpdateWrapper = Wrappers.update();
                     disasterinfoUpdateWrapper.eq("id", disasterinfo.getId());
                     disasterMapper.update(disasterinfo, disasterinfoUpdateWrapper);
@@ -219,7 +219,6 @@ public class DisasterInfoService {
     //删除
     public JSONObject deleteDisasterInfoById(int id) {
         MyJSONObject jsonObject = new MyJSONObject();
-
         UpdateWrapper<Disasterinfo> updateWrapper = Wrappers.update();
         updateWrapper.eq("id", id);
         QueryWrapper<Disasterinfo> queryWrapper = Wrappers.query();
@@ -284,12 +283,12 @@ public class DisasterInfoService {
             try {
                 if (file!=null&&!file.isEmpty()) {
                     //删除原来的文件，保存现在的文件
-                    fileOperation.deleteImg(disasterinfo.getPicture());
-                    picture = "/" + fileOperation.saveImg(file, dirPath, disasterinfo.getId() + "");
+                    fileOperation.deleteImg(dirPath+"/"+disasterinfo.getPicture());
+                    picture = "/" + fileOperation.saveImg(file, dirPath, disasterinfo.getPicture());
                     if (picture == null) {
                         throw new Exception();
                     }
-                    disasterinfo.setPicture(picture.split("/disaster/")[1]);
+                    disasterinfo.setPicture(picture.split("/"+dirPath+"/")[1]);
                 }
 
                 UpdateWrapper<Disasterinfo> disasterinfoUpdateWrapper = Wrappers.update();

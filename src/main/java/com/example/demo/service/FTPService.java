@@ -2,6 +2,10 @@ package com.example.demo.service;
 
 
 import com.alibaba.fastjson.JSONObject;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
+import com.baomidou.mybatisplus.core.injector.methods.Update;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.example.demo.entity.Disasterinfo;
 import com.example.demo.mapper.DisasterMapper;
 import com.example.demo.utility.Ftp;
@@ -21,6 +25,8 @@ import java.util.List;
 
 @Service
 public class FTPService {
+
+    String mainPath="static/";
 
     @Autowired
     private FileOperation fileOperation;
@@ -103,19 +109,24 @@ public class FTPService {
                 jsonObject.put("data", "0");
             } else {
                 //拼接子路径
-                String directory= ResourceUtils.getURL("classpath:static").getPath().replaceAll("%20"," ").substring(1).replace('/','\\');
-                directory= URLDecoder.decode(directory,"UTF-8");
+                int id;
+                String filename="";
                 for (int i = 0; i < disasterinfos.size(); i++) {
                     disasterMapper.insert(disasterinfos.get(i));
                     //对每一个，需要找到文件，存起来
                     //若目标文件夹不存在，则创建
-                    String path=directory+"/disaster/basic_earthquake/";
+                    String path=mainPath+"disaster/";
                     File upload = new File(path);
                     if (!upload.exists()) {
                         upload.mkdirs();
                     }
-                    path+=disasterinfos.get(i).getPicture();
+                    filename=disasterinfos.get(i).getId()+"."+disasterinfos.get(i).getPicture().split("\\.")[1];
+                    path+=filename;
                     getFileByFtp(disasterinfos.get(i).getPicture(),path);
+                    UpdateWrapper<Disasterinfo> disasterinfoUpdateWrapper= Wrappers.update();
+                    disasterinfoUpdateWrapper.eq("id",disasterinfos.get(i).getId());
+                    disasterinfos.get(i).setPicture(filename);
+                    disasterMapper.update(disasterinfos.get(i),disasterinfoUpdateWrapper);
                 }
                 jsonObject.put("ResultCode", ResultCode.success);
                 jsonObject.put("msg", "connect success, and insert success");

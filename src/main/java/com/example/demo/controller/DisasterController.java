@@ -10,7 +10,6 @@ import com.example.demo.utility.ResultCode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -56,7 +55,8 @@ public class DisasterController {
         return disasterInfoService.disasterUpload(file);
     }
 
-//    拿到全部的disaster，带搜索，分页
+
+    //拿到全部的disaster，带搜索，分页
     @RequestMapping("/getDisaster")
     @ResponseBody
     public ResponseEntity getAllDisaster(String key,
@@ -64,6 +64,7 @@ public class DisasterController {
                                          @RequestParam("limit")Integer limit){
         return new ResponseEntity<>(disasterInfoService.getDisaster(key,page,limit), HttpStatus.OK);
     }
+
 
     //从数据库中读取位置信息
     @GetMapping("/code")
@@ -103,6 +104,7 @@ public class DisasterController {
 
     }
 
+
     //按照年份划分计数
     @RequestMapping("/yearCount")
     @ResponseBody
@@ -115,6 +117,7 @@ public class DisasterController {
         return list;
     }
 
+
     //按照省份划分计数
     @RequestMapping("/provinceCount")
     @ResponseBody
@@ -126,6 +129,7 @@ public class DisasterController {
         }
         return list;
     }
+
 
     @RequestMapping("/addDisasterInfo")
     @ResponseBody
@@ -142,6 +146,7 @@ public class DisasterController {
                                       float magnitude,
                                       String reportingUnit,
                                       MultipartFile file){
+        System.out.println("添加");
         return disasterInfoService.addDisasterInfo(province, city, country, town, village, date, longitude, latitude, depth, magnitude, reportingUnit,file);
     }
 
