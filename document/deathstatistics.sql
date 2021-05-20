@@ -21,7 +21,7 @@ SET FOREIGN_KEY_CHECKS=0;
 DROP TABLE IF EXISTS `deathstatistics`;
 CREATE TABLE `deathstatistics` (
   `id` int NOT NULL AUTO_INCREMENT,
-  `death_id` char(19) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL COMMENT '人员伤亡灾情码 12位地理位置信息编码+7位灾情信息码',
+  `people_id` char(19) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL COMMENT '人员伤亡灾情码 12位地理位置信息编码+7位灾情信息码',
   `location` varchar(100) COLLATE utf8_bin DEFAULT NULL,
   `date` varchar(255) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL COMMENT '年-月-日 时:分:秒（24小时制）',
   `number` int DEFAULT NULL COMMENT '死亡人数',
