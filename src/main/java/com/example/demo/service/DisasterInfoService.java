@@ -53,7 +53,7 @@ public class DisasterInfoService {
 
         for (Disasterinfo disasterinfo:disasterinfos) {
             if (!coordinate.containsKey(disasterinfo.getLocation())){
-                coordinate.put(disasterinfo.getLocation(),new double[]{disasterinfo.getLatitude(),disasterinfo.getLongitude()});
+                coordinate.put(disasterinfo.getLocation(),new double[]{disasterinfo.getLongitude(),disasterinfo.getLatitude()});
 
                 JSONObject jsonObject=new JSONObject();
                 jsonObject.put("name",disasterinfo.getLocation());
@@ -148,7 +148,7 @@ public class DisasterInfoService {
         IPage<Disasterinfo> disasterinfoIPage = new Page<>(page, limit);
         IPage<Disasterinfo> result = disasterMapper.selectPage(disasterinfoIPage, queryWrapper);
         dataVO.setCount(result.getTotal());
-
+        System.out.println(result.getRecords());
         List<DisasterVO> disasterVOList=new ArrayList<>();
         //对记录数据进行处理，时间
         for (Disasterinfo disaster: result.getRecords()) {
@@ -251,6 +251,13 @@ public class DisasterInfoService {
                                              float magnitude, String reportingUnit, MultipartFile file) {
         MyJSONObject myJSONObject = new MyJSONObject();
         String code = chinaAdministrtiveService.doCode(province, city, country, town, village, date);
+
+        System.out.println(province);
+        System.out.println(city);
+        System.out.println(country);
+        System.out.println(town);
+        System.out.println(village);
+
         String location = province + city + country + town + village;
         String picture = "";
         QueryWrapper<Disasterinfo> disasterinfoQueryWrapper = Wrappers.query();

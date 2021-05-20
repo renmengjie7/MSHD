@@ -62,6 +62,12 @@ public class DisasterController {
     public ResponseEntity getAllDisaster(String key,
                                          @RequestParam("page")Integer page,
                                          @RequestParam("limit")Integer limit){
+        System.out.println(page);
+        System.out.println(limit);
+        System.out.println(key);
+        if(key==null){
+            key="";
+        }
         return new ResponseEntity<>(disasterInfoService.getDisaster(key,page,limit), HttpStatus.OK);
     }
 

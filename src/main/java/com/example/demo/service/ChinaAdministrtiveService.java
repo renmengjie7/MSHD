@@ -53,13 +53,13 @@ public class ChinaAdministrtiveService {
         String date_form = date.replaceAll("[[\\s-:punct:]]","");
         //判断时间长度是否正确
         if (date_form.length()!=14){
-            System.out.println("时间不对");
+            System.out.println("time is incorrect");
             return null;
         }
         //根据地理位置信息找到code
         code=this.findCode(province,city,country,town,village);
         if(code==null){
-            System.out.println("\n未找到该位置信息对应的代码\n");
+            System.out.println("\nthe location can not find code\n");
             return null;
         }
         else {
