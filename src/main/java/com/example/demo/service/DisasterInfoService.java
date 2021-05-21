@@ -96,7 +96,7 @@ public class DisasterInfoService {
             String filename = srcFile.getOriginalFilename();
             switch (filename.split("\\.")[1]) {
                 case "json":
-                    disasterinfos = fileOperation.jsonParse(result);
+                    disasterinfos = fileOperation.jsonParseBasic(result);
                     break;
                 case "xml":
                     disasterinfos = fileOperation.xmlParse(result);
@@ -148,7 +148,6 @@ public class DisasterInfoService {
         IPage<Disasterinfo> disasterinfoIPage = new Page<>(page, limit);
         IPage<Disasterinfo> result = disasterMapper.selectPage(disasterinfoIPage, queryWrapper);
         dataVO.setCount(result.getTotal());
-        System.out.println(result.getRecords());
         List<DisasterVO> disasterVOList=new ArrayList<>();
         //对记录数据进行处理，时间
         for (Disasterinfo disaster: result.getRecords()) {

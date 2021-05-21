@@ -2,6 +2,7 @@ package com.example.demo.service;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.example.demo.entity.ChinaAdministrative;
+import com.example.demo.entity.DistressedPeople;
 import com.example.demo.mapper.ChinaAdministrativeMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -34,6 +35,10 @@ public class ChinaAdministrtiveService {
             exception.printStackTrace();
             return null;
         }
+    }
+
+    public String doDistressedPeopleCode(DistressedPeople distressedPeople){
+        return "";
     }
 
     /**

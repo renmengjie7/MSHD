@@ -3,13 +3,11 @@ package com.example.demo.service;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.example.demo.entity.Disasterinfo;
+import com.example.demo.entity.DistressedPeople;
 import com.example.demo.mapper.DisasterMapper;
-import com.example.demo.service.ChinaAdministrtiveService;
 import net.sf.json.JSONArray;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.util.ClassUtils;
-import org.springframework.util.ResourceUtils;
 import org.springframework.web.multipart.MultipartFile;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -19,15 +17,12 @@ import org.xml.sax.InputSource;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.*;
-import java.net.URLDecoder;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.sql.Time;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 @Service
 public class FileOperation {
@@ -234,38 +229,57 @@ public class FileOperation {
         }
     }
 
-    public List<Disasterinfo> jsonParsePeople(String content) {
-        List<Disasterinfo> disasterinfos = new ArrayList<>();
+    public List<DistressedPeople> jsonParsePeople(String content) {
+        List<DistressedPeople> distressedPeopleList = new ArrayList<>();
         //逻辑处理，存入数据库，需要判断是否重复
         org.json.JSONObject data = new org.json.JSONObject(content);
         org.json.JSONObject disasterInfo = new org.json.JSONObject(data.get("disasterInfo").toString());
         JSONArray infos = JSONArray.fromObject(disasterInfo.get("info").toString());
         for (int i = 0; i < infos.size(); i++) {
             org.json.JSONObject info = new org.json.JSONObject(infos.get(i).toString());
-//            if (existDisasterInfo(info.getString("date"), info.getString("longitude"), info.getString("latitude"))) {
-//                //相同的数据已经出现过了
-//                return null;
-//            } else {
-            Disasterinfo disasterinfo = new Disasterinfo("", info.getString("province"),
-                    info.getString("city"), info.getString("country"),
-                    info.getString("town"), info.getString("village"),
-                    Timestamp.valueOf(info.getString("date")), info.getString("location"),
-                    Double.parseDouble(info.getString("longitude")), Double.parseDouble(info.getString("latitude")),
-                    Float.parseFloat(info.getString("depth")), Float.parseFloat(info.getString("magnitude")),
-                    info.getString("picture"), info.getString("reportingUnit"));
-            String code = chinaAdministrtiveService.doCode(disasterinfo.getProvince(), disasterinfo.getCity(), disasterinfo.getCountry(),
-                    disasterinfo.getTown(), disasterinfo.getVillage(), info.getString("date"));
-            if (code == null) {
+
+
+            String peopleId="";
+            String province=info.getString("province");
+            String city=info.getString("city");
+            String country=info.getString("country");
+            String town=info.getString("town");
+            String village=info.getString("village");
+            String location=info.getString("location");
+            Timestamp date=Timestamp.valueOf(info.getString("date"));
+            int number=Integer.parseInt(info.getString("number"));
+            int category;
+            String reportingUnit=info.getString("reportingUnit");
+            String earthquakeId=info.getString("earthquakeId");
+            String cate=info.getString("category");
+            switch (cate){
+                case "人员死亡":
+                    category=0;
+                    break;
+                case "人员受伤":
+                    category=1;
+                    break;
+                case "人员失踪":
+                    category=2;
+                    break;
+                default:
+                    category=0;
+            }
+            DistressedPeople distressedPeople=new DistressedPeople(peopleId,province,city,country,town,village,location,date,number,category,reportingUnit,earthquakeId);
+
+            //这里添加一个编码的代码
+            peopleId=chinaAdministrtiveService.doDistressedPeopleCode(distressedPeople);
+            if (peopleId == null) {
                 //编码时数据格式不正确
-                System.out.println("编码时数据格式不正确");
+                System.out.println("people encode fail because of the invalid format");
                 return null;
             } else {
-                disasterinfo.setDId(code);
-                disasterinfos.add(disasterinfo);
+                distressedPeople.setPeopleId(peopleId);
+                distressedPeopleList.add(distressedPeople);
             }
         }
-//        }
-        return disasterinfos;
+
+        return distressedPeopleList;
     }
 
 }

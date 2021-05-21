@@ -26,4 +26,19 @@ public class DistressedPeople {
     private int category;
     private String reportingUnit;
     private String earthquakeId;
+
+    public DistressedPeople(String peopleId, String province, String city, String country, String town, String village, String location, Timestamp date, int number, int category, String reportingUnit, String earthquakeId) {
+        this.peopleId = peopleId;
+        this.province = province;
+        this.city = city;
+        this.country = country;
+        this.town = town;
+        this.village = village;
+        this.location = location;
+        this.date = date;
+        this.number = number;
+        this.category = category;
+        this.reportingUnit = reportingUnit;
+        this.earthquakeId = earthquakeId;
+    }
 }

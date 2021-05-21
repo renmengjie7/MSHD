@@ -23,4 +23,13 @@ public class MyJSONObject extends JSONObject {
         this.put("data",data);
     }
 
+
+    public int getResultCode(){
+        return this.getInteger("ResultCode");
+    }
+
+    public String getMsg(){
+        return this.getString("msg");
+    }
+
 }
