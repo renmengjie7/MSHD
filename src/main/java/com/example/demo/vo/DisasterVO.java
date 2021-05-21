@@ -27,4 +27,8 @@ public class DisasterVO {
     private float magnitude;
     private String picture;
     private String reportingUnit;
+//    012死亡、受伤、失踪？
+    private int deathPeople=0;
+    private int injuredPeople=0;
+    private int missingPeople=0;
 }

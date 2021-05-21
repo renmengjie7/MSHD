@@ -62,15 +62,18 @@ public class DisasterController {
     public ResponseEntity getAllDisaster(String key,
                                          @RequestParam("page")Integer page,
                                          @RequestParam("limit")Integer limit){
-        System.out.println(page);
-        System.out.println(limit);
-        System.out.println(key);
         if(key==null){
             key="";
         }
         return new ResponseEntity<>(disasterInfoService.getDisaster(key,page,limit), HttpStatus.OK);
     }
 
+    //拿到全部的disaster，带搜索，分页
+    @RequestMapping("/getRecentDisaster")
+    @ResponseBody
+    public ResponseEntity getRecentDisaster(int number){
+        return new ResponseEntity<>(disasterInfoService.getRecentDisaster(number), HttpStatus.OK);
+    }
 
     //从数据库中读取位置信息
     @GetMapping("/code")
@@ -152,7 +155,6 @@ public class DisasterController {
                                       float magnitude,
                                       String reportingUnit,
                                       MultipartFile file){
-        System.out.println("添加");
         return disasterInfoService.addDisasterInfo(province, city, country, town, village, date, longitude, latitude, depth, magnitude, reportingUnit,file);
     }
 
@@ -181,7 +183,6 @@ public class DisasterController {
                                              float magnitude,
                                              String reportingUnit,
                                              MultipartFile file){
-        System.out.println(file);
         return disasterInfoService.updateDisasterInfoById(id, province, city, country, town, village, date, longitude, latitude, depth, magnitude, reportingUnit,file);
     }
 

@@ -7,7 +7,9 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.example.demo.entity.Disasterinfo;
+import com.example.demo.entity.DistressedPeople;
 import com.example.demo.mapper.DisasterMapper;
+import com.example.demo.mapper.DistressedPeopleMapper;
 import com.example.demo.utility.DateCount;
 import com.example.demo.utility.MyJSONObject;
 import com.example.demo.utility.ResultCode;
@@ -39,6 +41,9 @@ public class DisasterInfoService {
     private DisasterMapper disasterMapper;
     @Autowired
     private ChinaAdministrtiveService chinaAdministrtiveService;
+    @Autowired
+    private DistressedPeopleMapper distressedPeopleMapper;
+
 
     //地图数据
     public JSONObject MapData(Timestamp startDate, Timestamp endDate) {
@@ -138,6 +143,57 @@ public class DisasterInfoService {
         return jsonObject;
     }
 
+
+    //首页显示最近的几条数据
+    public DataVO<Disasterinfo> getRecentDisaster(int number){
+        DataVO dataVO = new DataVO();
+        dataVO.setCode(0);
+        dataVO.setMsg("");
+        QueryWrapper<Disasterinfo> queryWrapper = Wrappers.query();
+        queryWrapper.orderByDesc("date")
+                .last("limit 1,"+number);
+        List<Disasterinfo> disasterinfoList=disasterMapper.selectList(queryWrapper);
+        List<DisasterVO> disasterVOList=new ArrayList<>();
+        for (Disasterinfo disaster: disasterinfoList) {
+            DisasterVO disasterVO=new DisasterVO();
+            BeanUtils.copyProperties(disaster,disasterVO);
+
+            //在查询一下受灾人数？
+            QueryWrapper<DistressedPeople> distressedPeopleQueryWrapper1=Wrappers.query();
+            distressedPeopleQueryWrapper1.eq("category","0").eq("earthquake_id",disaster.getDId());
+            List<DistressedPeople> distressedPeopleList=distressedPeopleMapper.selectList(distressedPeopleQueryWrapper1);
+            int sum0=0;
+            for (DistressedPeople distressedPeople:distressedPeopleList){
+                sum0+=distressedPeople.getNumber();
+            }
+
+            QueryWrapper<DistressedPeople> distressedPeopleQueryWrapper2=Wrappers.query();
+            distressedPeopleQueryWrapper2.eq("category","1").eq("earthquake_id",disaster.getDId());
+            distressedPeopleList=distressedPeopleMapper.selectList(distressedPeopleQueryWrapper2);
+            int sum1=0;
+            for (DistressedPeople distressedPeople:distressedPeopleList){
+                sum1+=distressedPeople.getNumber();
+            }
+
+            QueryWrapper<DistressedPeople> distressedPeopleQueryWrapper3=Wrappers.query();
+            distressedPeopleQueryWrapper3.eq("category","2").eq("earthquake_id",disaster.getDId());
+            distressedPeopleList=distressedPeopleMapper.selectList(distressedPeopleQueryWrapper3);
+            int sum2=0;
+            for (DistressedPeople distressedPeople:distressedPeopleList){
+                sum2+=distressedPeople.getNumber();
+            }
+            disasterVO.setDeathPeople(sum0);
+            disasterVO.setInjuredPeople(sum1);
+            disasterVO.setMissingPeople(sum2);
+
+            disasterVO.setDate(disaster.getDate().toString().substring(0,"2021-04-21 18:15:57".length()));
+            disasterVOList.add(disasterVO);
+        }
+        dataVO.setCount((long) disasterVOList.size());
+        dataVO.setData(disasterVOList);
+        return dataVO;
+    }
+
     public DataVO<Disasterinfo> getDisaster(String key, Integer page, Integer limit) {
         DataVO dataVO = new DataVO();
         dataVO.setCode(0);
@@ -153,6 +209,34 @@ public class DisasterInfoService {
         for (Disasterinfo disaster: result.getRecords()) {
             DisasterVO disasterVO=new DisasterVO();
             BeanUtils.copyProperties(disaster,disasterVO);
+            //在查询一下受灾人数？
+            QueryWrapper<DistressedPeople> distressedPeopleQueryWrapper1=Wrappers.query();
+            distressedPeopleQueryWrapper1.eq("category","0").eq("earthquake_id",disaster.getDId());
+            List<DistressedPeople> distressedPeopleList=distressedPeopleMapper.selectList(distressedPeopleQueryWrapper1);
+            int sum0=0;
+            for (DistressedPeople distressedPeople:distressedPeopleList){
+                sum0+=distressedPeople.getNumber();
+            }
+
+            QueryWrapper<DistressedPeople> distressedPeopleQueryWrapper2=Wrappers.query();
+            distressedPeopleQueryWrapper2.eq("category","1").eq("earthquake_id",disaster.getDId());
+            distressedPeopleList=distressedPeopleMapper.selectList(distressedPeopleQueryWrapper2);
+            int sum1=0;
+            for (DistressedPeople distressedPeople:distressedPeopleList){
+                sum1+=distressedPeople.getNumber();
+            }
+
+            QueryWrapper<DistressedPeople> distressedPeopleQueryWrapper3=Wrappers.query();
+            distressedPeopleQueryWrapper3.eq("category","2").eq("earthquake_id",disaster.getDId());
+            distressedPeopleList=distressedPeopleMapper.selectList(distressedPeopleQueryWrapper3);
+            int sum2=0;
+            for (DistressedPeople distressedPeople:distressedPeopleList){
+                sum2+=distressedPeople.getNumber();
+            }
+            disasterVO.setDeathPeople(sum0);
+            disasterVO.setInjuredPeople(sum1);
+            disasterVO.setMissingPeople(sum2);
+
             disasterVO.setDate(disaster.getDate().toString().substring(0,"2021-04-21 18:15:57".length()));
             disasterVOList.add(disasterVO);
         }
@@ -250,12 +334,6 @@ public class DisasterInfoService {
                                              float magnitude, String reportingUnit, MultipartFile file) {
         MyJSONObject myJSONObject = new MyJSONObject();
         String code = chinaAdministrtiveService.doCode(province, city, country, town, village, date);
-
-        System.out.println(province);
-        System.out.println(city);
-        System.out.println(country);
-        System.out.println(town);
-        System.out.println(village);
 
         String location = province + city + country + town + village;
         String picture = "";
