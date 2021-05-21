@@ -10,7 +10,7 @@ Target Server Type    : MYSQL
 Target Server Version : 80019
 File Encoding         : 65001
 
-Date: 2021-05-20 21:41:20
+Date: 2021-05-21 08:57:31
 */
 
 SET FOREIGN_KEY_CHECKS=0;
@@ -23,7 +23,7 @@ CREATE TABLE `deathstatistics` (
   `id` int NOT NULL AUTO_INCREMENT,
   `people_id` char(19) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL COMMENT '人员伤亡灾情码 12位地理位置信息编码+7位灾情信息码',
   `location` varchar(100) COLLATE utf8_bin DEFAULT NULL,
-  `date` varchar(255) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL COMMENT '年-月-日 时:分:秒（24小时制）',
+  `date` datetime DEFAULT NULL COMMENT '年-月-日 时:分:秒（24小时制）',
   `number` int DEFAULT NULL COMMENT '死亡人数',
   `reporting_unit` varchar(50) COLLATE utf8_bin DEFAULT NULL COMMENT '上报单位',
   `earthquakeId` char(26) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL COMMENT '震情编码',
