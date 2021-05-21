@@ -91,7 +91,7 @@ public class FileOperation {
         return dirPath+"/"+filename+"."+suffixName;
     }
 
-    public List<Disasterinfo> jsonParse(String content) {
+    public List<Disasterinfo> jsonParseBasic(String content) {
         List<Disasterinfo> disasterinfos = new ArrayList<>();
         //逻辑处理，存入数据库，需要判断是否重复
         org.json.JSONObject data = new org.json.JSONObject(content);
@@ -232,6 +232,40 @@ public class FileOperation {
         } else {
             return true;
         }
+    }
+
+    public List<Disasterinfo> jsonParsePeople(String content) {
+        List<Disasterinfo> disasterinfos = new ArrayList<>();
+        //逻辑处理，存入数据库，需要判断是否重复
+        org.json.JSONObject data = new org.json.JSONObject(content);
+        org.json.JSONObject disasterInfo = new org.json.JSONObject(data.get("disasterInfo").toString());
+        JSONArray infos = JSONArray.fromObject(disasterInfo.get("info").toString());
+        for (int i = 0; i < infos.size(); i++) {
+            org.json.JSONObject info = new org.json.JSONObject(infos.get(i).toString());
+//            if (existDisasterInfo(info.getString("date"), info.getString("longitude"), info.getString("latitude"))) {
+//                //相同的数据已经出现过了
+//                return null;
+//            } else {
+            Disasterinfo disasterinfo = new Disasterinfo("", info.getString("province"),
+                    info.getString("city"), info.getString("country"),
+                    info.getString("town"), info.getString("village"),
+                    Timestamp.valueOf(info.getString("date")), info.getString("location"),
+                    Double.parseDouble(info.getString("longitude")), Double.parseDouble(info.getString("latitude")),
+                    Float.parseFloat(info.getString("depth")), Float.parseFloat(info.getString("magnitude")),
+                    info.getString("picture"), info.getString("reportingUnit"));
+            String code = chinaAdministrtiveService.doCode(disasterinfo.getProvince(), disasterinfo.getCity(), disasterinfo.getCountry(),
+                    disasterinfo.getTown(), disasterinfo.getVillage(), info.getString("date"));
+            if (code == null) {
+                //编码时数据格式不正确
+                System.out.println("编码时数据格式不正确");
+                return null;
+            } else {
+                disasterinfo.setDId(code);
+                disasterinfos.add(disasterinfo);
+            }
+        }
+//        }
+        return disasterinfos;
     }
 
 }

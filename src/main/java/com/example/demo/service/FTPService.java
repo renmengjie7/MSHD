@@ -81,6 +81,7 @@ public class FTPService {
         return result;
     }
 
+//    存储基本震情
     public JSONObject saveBasicDisaster() {
         MyJSONObject jsonObject = new MyJSONObject();
         try {
@@ -98,7 +99,71 @@ public class FTPService {
             String line;
             String result = "";
             while ((line = bufferedReader.readLine()) != null) result += line;
-            List<Disasterinfo> disasterinfos = fileOperation.jsonParse(result);
+            List<Disasterinfo> disasterinfos = fileOperation.jsonParseBasic(result);
+            if (disasterinfos == null) {
+                jsonObject.put("ResultCode", ResultCode.exception);
+                jsonObject.put("msg", "connect success, but data is invalid or exist");
+                jsonObject.put("data", "0");
+            } else if (disasterinfos.size() == 0) {
+                jsonObject.put("ResultCode", ResultCode.exception);
+                jsonObject.put("msg", "connect success, but no data");
+                jsonObject.put("data", "0");
+            } else {
+                //拼接子路径
+                int id;
+                String filename="";
+                for (int i = 0; i < disasterinfos.size(); i++) {
+                    disasterMapper.insert(disasterinfos.get(i));
+                    //对每一个，需要找到文件，存起来
+                    //若目标文件夹不存在，则创建
+                    String path=mainPath+"disaster/";
+                    File upload = new File(path);
+                    if (!upload.exists()) {
+                        upload.mkdirs();
+                    }
+                    filename=disasterinfos.get(i).getId()+"."+disasterinfos.get(i).getPicture().split("\\.")[1];
+                    path+=filename;
+                    getFileByFtp(disasterinfos.get(i).getPicture(),path);
+                    UpdateWrapper<Disasterinfo> disasterinfoUpdateWrapper= Wrappers.update();
+                    disasterinfoUpdateWrapper.eq("id",disasterinfos.get(i).getId());
+                    disasterinfos.get(i).setPicture(filename);
+                    disasterMapper.update(disasterinfos.get(i),disasterinfoUpdateWrapper);
+                }
+                jsonObject.put("ResultCode", ResultCode.success);
+                jsonObject.put("msg", "connect success, and insert success");
+                jsonObject.put("data", "0");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            jsonObject.put("ResultCode", ResultCode.exception);
+            jsonObject.put("msg", "connect success, but exception occur");
+            jsonObject.put("data", "0");
+        }
+        return jsonObject;
+    }
+
+
+//    存储受灾、死完、失踪人群
+    public JSONObject saveCasualtiesAndMissingPersons(){
+        MyJSONObject jsonObject = new MyJSONObject();
+        try {
+            ftp.changeToParentDirectory();
+            // 更改当前工作目录
+            ftp.changeWorkingDirectory("/ftpfile/disaster_data/casualties and missing persons");
+            InputStream inputStream = ftp.retrieveFileStream("people.json");
+            ftp.completePendingCommand();
+
+            if (inputStream==null){
+                throw new Exception();
+            }
+
+            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
+            String line;
+            String result = "";
+            while ((line = bufferedReader.readLine()) != null) result += line;
+            System.out.println(result);
+            //这边的处理有一些变化
+            List<Disasterinfo> disasterinfos = fileOperation.jsonParsePeople(result);
             if (disasterinfos == null) {
                 jsonObject.put("ResultCode", ResultCode.exception);
                 jsonObject.put("msg", "connect success, but data is invalid or exist");
