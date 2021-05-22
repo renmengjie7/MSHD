@@ -2,8 +2,10 @@ package com.example.demo.service;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.example.demo.entity.ChinaAdministrative;
+import com.example.demo.entity.Disasterinfo;
 import com.example.demo.entity.DistressedPeople;
 import com.example.demo.mapper.ChinaAdministrativeMapper;
+import com.example.demo.mapper.DisasterMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -16,6 +18,8 @@ public class ChinaAdministrtiveService {
 
     @Autowired
     private ChinaAdministrativeMapper chinaAdministrativeMapper;
+    @Autowired
+    private DisasterMapper disasterMapper;
 
     public String findCode(String province,String city,String district,String town,String village){
         QueryWrapper<ChinaAdministrative> queryWrapper=new QueryWrapper<>();
@@ -37,12 +41,77 @@ public class ChinaAdministrtiveService {
         }
     }
 
+    /**
+     * 人员伤亡灾情编码
+     * @param distressedPeople
+     * @return code编码成功 null编码失败
+     */
     public String doDistressedPeopleCode(DistressedPeople distressedPeople){
-        return "";
+        String locationCode,messageCode;
+        //根据地理位置信息找到code
+        locationCode=this.findCode(distressedPeople.getProvince(),
+                distressedPeople.getCity(),
+                distressedPeople.getCountry(),
+                distressedPeople.getTown(),
+                distressedPeople.getVillage());
+        if(locationCode==null){
+            System.out.println("\nthe location can not find code\n");
+            return null;
+        }
+        else {
+            locationCode = (locationCode+"000000000000").substring(0,12);
+            //灾情信息编码
+            if(distressedPeople.getCategory()==0||distressedPeople.getCategory()==1||distressedPeople.getCategory()==2) {
+                float magnitude=selectMagnitude(distressedPeople.getEarthquakeId());
+                int grade=gradeCalculate(magnitude,distressedPeople.getNumber());
+                messageCode = "11"
+                        + (distressedPeople.getCategory() + 1)
+                        + String.format("%03d", distressedPeople.getId())
+                        +grade;
+            }
+            else//类别不正确
+               return null;
+        }
+        return locationCode+messageCode;
     }
 
     /**
-     * 作为一个函数被调用 位置和时间信息作为参数
+     * 计算灾害等级
+     * @param magnitude
+     * @param number
+     * @return 1特别重大 2重大 3较大 4一般
+     */
+    public int gradeCalculate(float magnitude,int number){
+        if(magnitude<5)//一般
+            return 4;
+        else {
+            if(magnitude>=7.0||number>=300)//特别重大
+                return 1;
+            else if((6.0<=magnitude&&magnitude<7)||(number>=50&&number<300))//重大
+                return 2;
+            else if(magnitude<6.0||number<50)//较大
+                return 3;
+            else return 0;
+        }
+    }
+
+    //查询震级
+    public float selectMagnitude(String earthquakeId){
+        QueryWrapper<Disasterinfo> disasterinfoQueryWrapper=new QueryWrapper<>();
+        disasterinfoQueryWrapper.select("magnitude");
+        disasterinfoQueryWrapper.eq("d_id",earthquakeId);
+        disasterinfoQueryWrapper.last("limit 1");
+        try {
+            Disasterinfo disasterinfo = disasterMapper.selectOne(disasterinfoQueryWrapper);
+            return disasterinfo.getMagnitude();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return 0;
+        }
+    }
+
+    /**
+     * 基本震情编码
      * @param province
      * @param city
      * @param country
