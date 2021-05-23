@@ -2,7 +2,7 @@ package com.example.demo.controller;
 
 import com.alibaba.fastjson.JSONObject;
 import com.example.demo.entity.Disasterinfo;
-import com.example.demo.entity.Echarts;
+import com.example.demo.vo.Echarts;
 import com.example.demo.service.ChinaAdministrtiveService;
 import com.example.demo.service.DisasterInfoService;
 import com.example.demo.utility.MyJSONObject;

@@ -1,5 +1,6 @@
-package com.example.demo.entity;
+package com.example.demo.vo;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 //用于echarts图显示

@@ -1,23 +1,22 @@
 package com.example.demo.service;
 
-import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.example.demo.entity.Disasterinfo;
 import com.example.demo.entity.DistressedPeople;
+import com.example.demo.vo.Echarts;
 import com.example.demo.mapper.DistressedPeopleMapper;
-import com.example.demo.utility.MyJSONObject;
 import com.example.demo.vo.DataVO;
-import com.example.demo.vo.DisasterVO;
 import com.example.demo.vo.DistressedPeopleVO;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class DistressedPeopleService {
@@ -50,4 +49,37 @@ public class DistressedPeopleService {
     }
 
 
+    //根据震情编码获取人员死亡、受伤、失踪的百分比
+    public DataVO<Echarts> getDistressedPeoplePercentage(String earthquakeId) {
+        DataVO dataVO = new DataVO();
+        dataVO.setCode(0);
+        dataVO.setMsg("");
+        QueryWrapper queryWrapper = new QueryWrapper();
+        queryWrapper.select("category,sum(number) as count");
+        queryWrapper.eq("earthquake_id",earthquakeId);
+        queryWrapper.groupBy("category");
+        queryWrapper.orderByAsc("category");
+        List<Map<String, Object>> mapList = distressedPeopleMapper.selectMaps(queryWrapper);
+        dataVO.setCount((long) mapList.size());
+        if(mapList.isEmpty())
+        {
+            dataVO.setCode(2);
+            dataVO.setMsg("could not find distress with the earthquakeId");
+        }
+        else {
+            List<Echarts> list = new ArrayList<Echarts>();
+            String name;
+            for (Map<String, Object> map : mapList) {
+                if(map.get("category").equals(0))
+                    name="死亡";
+                else if(map.get("category").equals(1))
+                    name="受伤";
+                else name="失踪";
+                list.add(new Echarts(name, ((BigDecimal) map.get("count")).intValue()));
+            }
+            dataVO.setData(list);
+        }
+        return dataVO;
+
+    }
 }

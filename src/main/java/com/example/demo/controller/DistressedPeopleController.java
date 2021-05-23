@@ -1,6 +1,5 @@
 package com.example.demo.controller;
 
-import com.alibaba.fastjson.JSONObject;
 import com.example.demo.service.DistressedPeopleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -23,6 +22,13 @@ public class DistressedPeopleController {
             key="";
         }
         return new ResponseEntity<>(distressedPeopleService.getDistressedPeopleByEarthquakeId(earthquakeId, key, page, limit), HttpStatus.OK);
+    }
+
+    //获取人员死亡、受伤、失踪的百分比
+    @RequestMapping("/getDistressedPeoplePercentage")
+    @ResponseBody
+    public ResponseEntity getDistressedPeoplePercentage(String earthquakeId) {
+        return new ResponseEntity<>(distressedPeopleService.getDistressedPeoplePercentage(earthquakeId),HttpStatus.OK);
     }
 
 }
