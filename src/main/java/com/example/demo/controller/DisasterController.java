@@ -187,7 +187,7 @@ public class DisasterController {
     }
 
 
-    @RequestMapping("/getDisasterDetail")
+    @RequestMapping("/getDisasterDetailByEarthquakeId")
     @ResponseBody
     //显示震情详细信息
     public ResponseEntity showDisasterDetail(String earthquakeId) {
