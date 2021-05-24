@@ -15,6 +15,7 @@ import com.example.demo.utility.MyJSONObject;
 import com.example.demo.utility.ResultCode;
 import com.example.demo.vo.DataVO;
 import com.example.demo.vo.DisasterVO;
+import com.example.demo.vo.Echarts;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -23,6 +24,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
@@ -413,6 +415,29 @@ public class DisasterInfoService {
         return mapList;
     }
 
+    //震情详细信息
+    public DataVO<Disasterinfo> getDistressedPeoplePercentage(String earthquakeId) {
+        DataVO dataVO = new DataVO();
+        dataVO.setCode(0);
+        dataVO.setMsg("");
+        QueryWrapper queryWrapper = new QueryWrapper();
+        queryWrapper.eq("d_id",earthquakeId);
+        queryWrapper.last("limit 1");
+        Disasterinfo disasterinfo = disasterMapper.selectOne(queryWrapper);
+        if(disasterinfo==null)
+        {
+            dataVO.setCount((long) 0);
+            dataVO.setCode(2);
+            dataVO.setMsg("could not find disaster with the earthquakeId");
+        }
+        else {
+            List<Disasterinfo> list = new ArrayList<Disasterinfo>();
+            list.add(disasterinfo);
+            dataVO.setCount((long) 1);
+            dataVO.setData(list);
+        }
+        return dataVO;
+    }
 }
 
 
