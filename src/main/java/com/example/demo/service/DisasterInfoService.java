@@ -415,29 +415,6 @@ public class DisasterInfoService {
         return mapList;
     }
 
-    //震情详细信息
-    public DataVO<Disasterinfo> getDistressedPeoplePercentage(String earthquakeId) {
-        DataVO dataVO = new DataVO();
-        dataVO.setCode(0);
-        dataVO.setMsg("");
-        QueryWrapper queryWrapper = new QueryWrapper();
-        queryWrapper.eq("d_id",earthquakeId);
-        queryWrapper.last("limit 1");
-        Disasterinfo disasterinfo = disasterMapper.selectOne(queryWrapper);
-        if(disasterinfo==null)
-        {
-            dataVO.setCount((long) 0);
-            dataVO.setCode(2);
-            dataVO.setMsg("could not find disaster with the earthquakeId");
-        }
-        else {
-            List<Disasterinfo> list = new ArrayList<Disasterinfo>();
-            list.add(disasterinfo);
-            dataVO.setCount((long) 1);
-            dataVO.setData(list);
-        }
-        return dataVO;
-    }
 }
 
 

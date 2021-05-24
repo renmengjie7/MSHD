@@ -187,12 +187,6 @@ public class DisasterController {
     }
 
 
-    @RequestMapping("/getDisasterDetail")
-    @ResponseBody
-    //显示震情详细信息
-    public ResponseEntity showDisasterDetail(String earthquakeId) {
-        return new ResponseEntity<>(disasterInfoService.getDistressedPeoplePercentage(earthquakeId),HttpStatus.OK);
-    }
 
 
 }
