@@ -1,16 +1,22 @@
 package com.example.demo.service;
 
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.example.demo.entity.DistressedPeople;
+import com.example.demo.utility.MyJSONObject;
+import com.example.demo.utility.ResultCode;
 import com.example.demo.vo.Echarts;
 import com.example.demo.mapper.DistressedPeopleMapper;
 import com.example.demo.vo.DataVO;
 import com.example.demo.vo.DistressedPeopleVO;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -48,7 +54,6 @@ public class DistressedPeopleService {
         return dataVO;
     }
 
-
     //根据震情编码获取人员死亡、受伤、失踪的百分比
     public DataVO<Echarts> getDistressedPeoplePercentage(String earthquakeId) {
         DataVO dataVO = new DataVO();
@@ -82,4 +87,22 @@ public class DistressedPeopleService {
         return dataVO;
 
     }
+
+    //删除某一条记录
+    public JSONObject deleteDistressedPeopleById(String id) {
+        MyJSONObject myJSONObject=new MyJSONObject();
+        UpdateWrapper<DistressedPeople> distressedPeopleUpdateWrapper=Wrappers.update();
+        distressedPeopleUpdateWrapper.eq("id",id);
+        int re=distressedPeopleMapper.delete(distressedPeopleUpdateWrapper);
+        if(re==1){
+            myJSONObject.putResultCode(ResultCode.success);
+            myJSONObject.putMsg("delete success");
+        }
+        else {
+            myJSONObject.putResultCode(ResultCode.invalid);
+            myJSONObject.putMsg("DistressedPeople id does not exist");
+        }
+        return myJSONObject;
+    }
+
 }

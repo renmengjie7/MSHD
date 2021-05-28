@@ -1,6 +1,8 @@
 package com.example.demo.controller;
 
+import com.alibaba.fastjson.JSONObject;
 import com.example.demo.service.DistressedPeopleService;
+import com.example.demo.utility.MyJSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -29,6 +31,13 @@ public class DistressedPeopleController {
     @ResponseBody
     public ResponseEntity getDistressedPeoplePercentage(String earthquakeId) {
         return new ResponseEntity<>(distressedPeopleService.getDistressedPeoplePercentage(earthquakeId),HttpStatus.OK);
+    }
+
+    //根据ID删除某个数据
+    @RequestMapping("/deleteDistressedPeopleById")
+    @ResponseBody
+    public JSONObject deleteDistressedPeopleById(String id) {
+        return distressedPeopleService.deleteDistressedPeopleById(id);
     }
 
 }
