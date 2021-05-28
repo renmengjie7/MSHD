@@ -6,6 +6,7 @@ import com.example.demo.utility.MyJSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -34,7 +35,7 @@ public class DistressedPeopleController {
     }
 
     //根据ID删除某个数据
-    @RequestMapping("/deleteDistressedPeopleById")
+    @DeleteMapping("/deleteDistressedPeopleById")
     @ResponseBody
     public JSONObject deleteDistressedPeopleById(String id) {
         return distressedPeopleService.deleteDistressedPeopleById(id);
