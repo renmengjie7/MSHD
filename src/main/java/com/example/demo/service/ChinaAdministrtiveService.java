@@ -46,7 +46,8 @@ public class ChinaAdministrtiveService {
      * @param distressedPeople
      * @return code编码成功 null编码失败
      */
-    public String doDistressedPeopleCode(DistressedPeople distressedPeople){
+    public Map<String,String> doDistressedPeopleCode(DistressedPeople distressedPeople){
+        Map<String,String> map = new HashMap<>();
         String locationCode,messageCode;
         //根据地理位置信息找到code
         locationCode=this.findCode(distressedPeople.getProvince(),
@@ -55,24 +56,34 @@ public class ChinaAdministrtiveService {
                 distressedPeople.getTown(),
                 distressedPeople.getVillage());
         if(locationCode==null){
-            System.out.println("\nthe location can not find code\n");
-            return null;
+            map.put("resCode","0");
+            map.put("msg","the location can not find code");
         }
         else {
             locationCode = (locationCode+"000000000000").substring(0,12);
             //灾情信息编码
             if(distressedPeople.getCategory()==0||distressedPeople.getCategory()==1||distressedPeople.getCategory()==2) {
-                float magnitude=selectMagnitude(distressedPeople.getEarthquakeId());
-                int grade=gradeCalculate(magnitude,distressedPeople.getNumber());
-                messageCode = "11"
-                        + (distressedPeople.getCategory() + 1)
-                        + String.format("%03d", distressedPeople.getId())
-                        +grade;
+                float magnitude = selectMagnitude(distressedPeople.getEarthquakeId());
+                if (magnitude == -1) {
+                    map.put("resCode", "0");
+                    map.put("msg", "can not find disaster with this EarthquakeId");
+                }
+                else {
+                    int grade = gradeCalculate(magnitude, distressedPeople.getNumber());
+                    messageCode = "11"
+                            + (distressedPeople.getCategory() + 1)
+                            + String.format("%03d", distressedPeople.getId())
+                            + grade;
+                    map.put("resCode", "1");
+                    map.put("msg", locationCode + messageCode);
+                }
             }
-            else//类别不正确
-               return null;
+            else {//类别不正确
+                map.put("resCode","0");
+                map.put("msg","the category is incorrect");
+            }
         }
-        return locationCode+messageCode;
+        return map;
     }
 
     /**
@@ -98,15 +109,16 @@ public class ChinaAdministrtiveService {
     //查询震级
     public float selectMagnitude(String earthquakeId){
         QueryWrapper<Disasterinfo> disasterinfoQueryWrapper=new QueryWrapper<>();
-        disasterinfoQueryWrapper.select("magnitude");
         disasterinfoQueryWrapper.eq("d_id",earthquakeId);
         disasterinfoQueryWrapper.last("limit 1");
         try {
             Disasterinfo disasterinfo = disasterMapper.selectOne(disasterinfoQueryWrapper);
+            if(disasterinfo==null)
+                System.out.printf("not find %s\n",earthquakeId);
             return disasterinfo.getMagnitude();
         } catch (Exception e) {
             e.printStackTrace();
-            return 0;
+            return -1;
         }
     }
 
