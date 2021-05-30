@@ -23,6 +23,7 @@ import java.nio.file.Paths;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class FileOperation {
@@ -268,12 +269,14 @@ public class FileOperation {
             DistressedPeople distressedPeople=new DistressedPeople(peopleId,province,city,country,town,village,location,date,number,category,reportingUnit,earthquakeId);
 
             //这里添加一个编码的代码
-            peopleId=chinaAdministrtiveService.doDistressedPeopleCode(distressedPeople);
-            if (peopleId == null) {
+            //这里添加一个编码的代码
+            Map<String,String> map=chinaAdministrtiveService.doDistressedPeopleCode(distressedPeople);
+            if (map.get("resCode")=="0") {
                 //编码时数据格式不正确
                 System.out.println("people encode fail because of the invalid format");
                 return null;
             } else {
+                peopleId=map.get("msg");
                 distressedPeople.setPeopleId(peopleId);
                 distressedPeopleList.add(distressedPeople);
             }
