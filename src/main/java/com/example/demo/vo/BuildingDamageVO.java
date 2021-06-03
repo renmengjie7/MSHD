@@ -1,7 +1,5 @@
-package com.example.demo.entity;
+package com.example.demo.vo;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -11,8 +9,7 @@ import java.sql.Timestamp;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class BuildingDamage {
-    @TableId(value = "id", type = IdType.AUTO)
+public class BuildingDamageVO {
     private int id;
     private String building_damage_id    ;
     private String province              ;
@@ -21,7 +18,7 @@ public class BuildingDamage {
     private String town                  ;
     private String village               ;
     private String location              ;
-    private Timestamp date               ;
+    private String date                  ;
     private int category                 ;
     private double basicallyIntactSquare ;
     private double damagedSquare         ;
