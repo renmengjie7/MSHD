@@ -4,12 +4,8 @@ package com.example.demo.service;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
-import com.example.demo.entity.BuildingDamage;
-import com.example.demo.entity.Disasterinfo;
-import com.example.demo.entity.DistressedPeople;
-import com.example.demo.mapper.BuildingDamageMapper;
-import com.example.demo.mapper.DisasterMapper;
-import com.example.demo.mapper.DistressedPeopleMapper;
+import com.example.demo.entity.*;
+import com.example.demo.mapper.*;
 import com.example.demo.utility.Ftp;
 import com.example.demo.utility.FtpInterface;
 import com.example.demo.utility.MyJSONObject;
@@ -36,6 +32,10 @@ public class FTPService {
     private DistressedPeopleMapper distressedPeopleMapper;
     @Autowired
     private BuildingDamageMapper buildingDamageMapper;
+    @Autowired
+    private LifelineDisasterMapper lifelineDisasterMapper;
+    @Autowired
+    private SecondaryDisasterMapper secondaryDisasterMapper;
 
     FTPClient ftp;
 
@@ -53,7 +53,13 @@ public class FTPService {
             MyJSONObject jsonObject1=saveBasicDisaster();
             MyJSONObject jsonObject2=savePeople();
             MyJSONObject jsonObject3=saveBuildingDamage();
-            if (jsonObject1.getResultCode()==ResultCode.success&&jsonObject2.getResultCode()==ResultCode.success&&jsonObject3.getResultCode()==ResultCode.success){
+            MyJSONObject jsonObject4=saveLifelineDisaster();
+            MyJSONObject jsonObject5=saveSecondaryDisaster();
+            if (jsonObject1.getResultCode()==ResultCode.success
+                    &&jsonObject2.getResultCode()==ResultCode.success
+                    &&jsonObject3.getResultCode()==ResultCode.success
+                    &&jsonObject4.getResultCode()==ResultCode.success
+                    &&jsonObject5.getResultCode()==ResultCode.success){
                 jsonObject1.putMsg(jsonObject1.getMsg()+"    "+jsonObject2.getMsg()+"    "+jsonObject3.getMsg());
                 return jsonObject1;
             }
@@ -98,7 +104,7 @@ public class FTPService {
         return result;
     }
 
-//    存储基本震情
+    //存储基本震情
     public MyJSONObject saveBasicDisaster() {
         MyJSONObject jsonObject = new MyJSONObject();
         try {
@@ -155,8 +161,7 @@ public class FTPService {
         return jsonObject;
     }
 
-
-//    存储受灾、死完、失踪人群
+    //存储受灾、死完、失踪人群
     public MyJSONObject savePeople(){
         MyJSONObject jsonObject = new MyJSONObject();
         try {
@@ -196,7 +201,7 @@ public class FTPService {
         return jsonObject;
     }
 
-//    存储受灾房屋数据
+    //存储受灾房屋数据
     public MyJSONObject saveBuildingDamage(){
         MyJSONObject jsonObject = new MyJSONObject();
         try {
@@ -231,6 +236,121 @@ public class FTPService {
             e.printStackTrace();
             jsonObject.put("ResultCode", ResultCode.exception);
             jsonObject.put("msg", "connect success, but building damage data insert  exception occur");
+            jsonObject.put("data", "0");
+        }
+        return jsonObject;
+    }
+
+
+    //存储生命线灾情
+    public MyJSONObject saveLifelineDisaster(){
+        MyJSONObject jsonObject = new MyJSONObject();
+        try {
+            ftp.changeToParentDirectory();
+            // 更改当前工作目录
+            ftp.changeWorkingDirectory("/ftpfile/disaster_data/lifeline disaster");
+            InputStream inputStream = ftp.retrieveFileStream("LifeLineTemplate1.json");
+            ftp.completePendingCommand();
+
+            if (inputStream==null){
+                throw new Exception();
+            }
+
+            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
+            String line;
+            String result = "";
+            while ((line = bufferedReader.readLine()) != null) result += line;
+            List<LifelineDisaster> lifelineDisasters = fileOperation.jsonParseLifelineDisaster(result);
+            if (lifelineDisasters == null) {
+                jsonObject.put("ResultCode", ResultCode.exception);
+                jsonObject.put("msg", "connect success, but lifeline Disaster data is invalid or exist");
+                jsonObject.put("data", "0");
+            } else {
+                //拼接子路径
+                int id;
+                String filename="";
+                for (int i = 0; i < lifelineDisasters.size(); i++) {
+                    lifelineDisasterMapper.insert(lifelineDisasters.get(i));
+                    //对每一个，需要找到文件，存起来
+                    //若目标文件夹不存在，则创建
+                    String path=mainPath+"lifeline/";
+                    File upload = new File(path);
+                    if (!upload.exists()) {
+                        upload.mkdirs();
+                    }
+                    filename=lifelineDisasters.get(i).getId()+"."+lifelineDisasters.get(i).getPicture().split("\\.")[1];
+                    path+=filename;
+                    getFileByFtp(lifelineDisasters.get(i).getPicture(),path);
+                    UpdateWrapper<LifelineDisaster> lifelineDisasterUpdateWrapper= Wrappers.update();
+                    lifelineDisasterUpdateWrapper.eq("id",lifelineDisasters.get(i).getId());
+                    lifelineDisasters.get(i).setPicture(filename);
+                    lifelineDisasterMapper.update(lifelineDisasters.get(i),lifelineDisasterUpdateWrapper);
+                }
+                jsonObject.put("ResultCode", ResultCode.success);
+                jsonObject.put("msg", "connect success, and basic disaster insert success");
+                jsonObject.put("data", "0");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            jsonObject.put("ResultCode", ResultCode.exception);
+            jsonObject.put("msg", "connect success, but basic disaster insert exception occur");
+            jsonObject.put("data", "0");
+        }
+        return jsonObject;
+    }
+
+
+    //存储二次灾害
+    public MyJSONObject saveSecondaryDisaster(){
+        MyJSONObject jsonObject = new MyJSONObject();
+        try {
+            ftp.changeToParentDirectory();
+            // 更改当前工作目录
+            ftp.changeWorkingDirectory("/ftpfile/disaster_data/secondary disaster");
+            InputStream inputStream = ftp.retrieveFileStream("SecondTemplate2.json");
+            ftp.completePendingCommand();
+
+            if (inputStream==null){
+                throw new Exception();
+            }
+            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
+            String line;
+            String result = "";
+            while ((line = bufferedReader.readLine()) != null) result += line;
+            List<SecondaryDisaster> secondaryDisasters= fileOperation.jsonParseSecondaryDisaster(result);
+            if (secondaryDisasters == null) {
+                jsonObject.put("ResultCode", ResultCode.exception);
+                jsonObject.put("msg", "connect success, but Secondary Disaster data is invalid or exist");
+                jsonObject.put("data", "0");
+            } else {
+                //拼接子路径
+                int id;
+                String filename="";
+                for (int i = 0; i < secondaryDisasters.size(); i++) {
+                    secondaryDisasterMapper.insert(secondaryDisasters.get(i));
+                    //对每一个，需要找到文件，存起来
+                    //若目标文件夹不存在，则创建
+                    String path=mainPath+"lifeline/";
+                    File upload = new File(path);
+                    if (!upload.exists()) {
+                        upload.mkdirs();
+                    }
+                    filename=secondaryDisasters.get(i).getId()+"."+secondaryDisasters.get(i).getPicture().split("\\.")[1];
+                    path+=filename;
+                    getFileByFtp(secondaryDisasters.get(i).getPicture(),path);
+                    UpdateWrapper<SecondaryDisaster> secondaryDisasterUpdateWrapper= Wrappers.update();
+                    secondaryDisasterUpdateWrapper.eq("id",secondaryDisasters.get(i).getId());
+                    secondaryDisasters.get(i).setPicture(filename);
+                    secondaryDisasterMapper.update(secondaryDisasters.get(i),secondaryDisasterUpdateWrapper);
+                }
+                jsonObject.put("ResultCode", ResultCode.success);
+                jsonObject.put("msg", "connect success, and Secondary Disaster insert success");
+                jsonObject.put("data", "0");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            jsonObject.put("ResultCode", ResultCode.exception);
+            jsonObject.put("msg", "connect success, but Secondary Disaster insert exception occur");
             jsonObject.put("data", "0");
         }
         return jsonObject;

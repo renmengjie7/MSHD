@@ -18,4 +18,3 @@ create table softwaremanage.building_damage
     earthquakeId          char(26)                 null comment '震情编码'
 )
     collate = utf8_bin;
-

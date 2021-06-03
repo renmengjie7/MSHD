@@ -1,10 +1,7 @@
 package com.example.demo.service;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.example.demo.entity.BuildingDamage;
-import com.example.demo.entity.ChinaAdministrative;
-import com.example.demo.entity.Disasterinfo;
-import com.example.demo.entity.DistressedPeople;
+import com.example.demo.entity.*;
 import com.example.demo.mapper.ChinaAdministrativeMapper;
 import com.example.demo.mapper.DisasterMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,6 +41,14 @@ public class ChinaAdministrtiveService {
 
 
     public String doBuildingDamageCode(BuildingDamage buildingDamage){
+        return "";
+    }
+
+    public String doLifelineDisasterCode(LifelineDisaster lifelineDisaster){
+        return "";
+    }
+
+    public String doSecondaryDisasterCode(SecondaryDisaster secondaryDisaster){
         return "";
     }
 

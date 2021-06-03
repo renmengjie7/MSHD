@@ -14,7 +14,7 @@ import java.sql.Timestamp;
 public class BuildingDamage {
     @TableId(value = "id", type = IdType.AUTO)
     private int id;
-    private String building_damage_id    ;
+    private String buildingDamageId    ;
     private String province              ;
     private String city                  ;
     private String country               ;
@@ -27,12 +27,12 @@ public class BuildingDamage {
     private double damagedSquare         ;
     private double destroyedSquare       ;
     private String note                  ;
-    private String reporting_unit        ;
+    private String reportingUnit        ;
     private String earthquakeId          ;
 
 
-    public BuildingDamage(String building_damage_id, String province, String city, String country, String town, String village, String location, Timestamp date, int category, double basicallyIntactSquare, double damagedSquare, double destroyedSquare, String note, String reporting_unit, String earthquakeId) {
-        this.building_damage_id = building_damage_id;
+    public BuildingDamage(String buildingDamageId, String province, String city, String country, String town, String village, String location, Timestamp date, int category, double basicallyIntactSquare, double damagedSquare, double destroyedSquare, String note, String reportingUnit, String earthquakeId) {
+        this.buildingDamageId = buildingDamageId;
         this.province = province;
         this.city = city;
         this.country = country;
@@ -45,7 +45,7 @@ public class BuildingDamage {
         this.damagedSquare = damagedSquare;
         this.destroyedSquare = destroyedSquare;
         this.note = note;
-        this.reporting_unit = reporting_unit;
+        this.reportingUnit = reportingUnit;
         this.earthquakeId = earthquakeId;
     }
 }
