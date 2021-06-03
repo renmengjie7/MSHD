@@ -29,4 +29,23 @@ public class BuildingDamage {
     private String note                  ;
     private String reporting_unit        ;
     private String earthquakeId          ;
+
+
+    public BuildingDamage(String building_damage_id, String province, String city, String country, String town, String village, String location, Timestamp date, int category, double basicallyIntactSquare, double damagedSquare, double destroyedSquare, String note, String reporting_unit, String earthquakeId) {
+        this.building_damage_id = building_damage_id;
+        this.province = province;
+        this.city = city;
+        this.country = country;
+        this.town = town;
+        this.village = village;
+        this.location = location;
+        this.date = date;
+        this.category = category;
+        this.basicallyIntactSquare = basicallyIntactSquare;
+        this.damagedSquare = damagedSquare;
+        this.destroyedSquare = destroyedSquare;
+        this.note = note;
+        this.reporting_unit = reporting_unit;
+        this.earthquakeId = earthquakeId;
+    }
 }

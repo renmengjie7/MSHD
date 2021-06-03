@@ -2,6 +2,7 @@ package com.example.demo.service;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.example.demo.entity.BuildingDamage;
 import com.example.demo.entity.Disasterinfo;
 import com.example.demo.entity.DistressedPeople;
 import com.example.demo.mapper.DisasterMapper;
@@ -283,6 +284,69 @@ public class FileOperation {
         }
 
         return distressedPeopleList;
+    }
+
+    //解析受灾房屋
+    public List<BuildingDamage> jsonParseBuildingDamage(String content) {
+        List<BuildingDamage> buildingDamageList = new ArrayList<>();
+        //逻辑处理，存入数据库，需要判断是否重复
+        org.json.JSONObject data = new org.json.JSONObject(content);
+        org.json.JSONObject disasterInfo = new org.json.JSONObject(data.get("disasterInfo").toString());
+        JSONArray infos = JSONArray.fromObject(disasterInfo.get("info").toString());
+        for (int i = 0; i < infos.size(); i++) {
+            org.json.JSONObject info = new org.json.JSONObject(infos.get(i).toString());
+
+            String building_damage_id="";
+            String province=info.getString("province");
+            String city=info.getString("city");
+            String country=info.getString("country");
+            String town=info.getString("town");
+            String village=info.getString("village");
+            String location=info.getString("location");
+            Timestamp date=Timestamp.valueOf(info.getString("date"));
+            String note=info.getString("note");
+            String reportingUnit=info.getString("reportingUnit");
+            String earthquakeId=info.getString("earthquakeId");
+            double basicallyIntactSquare=Double.parseDouble(info.getString("basicallyIntactSquare"));
+            double damagedSquare=Double.parseDouble(info.getString("damagedSquare"));
+            double destroyedSquare=Double.parseDouble(info.getString("destroyedSquare"));
+            int category;
+            String cate=info.getString("category");
+            switch (cate){
+                case "房屋破坏土木":
+                    category=0;
+                    break;
+                case "房屋破坏砖木":
+                    category=1;
+                    break;
+                case "房屋破坏砖混":
+                    category=2;
+                    break;
+                case "房屋破坏框架":
+                    category=3;
+                    break;
+                case "房屋破坏其他":
+                    category=4;
+                    break;
+                default:
+                    category=0;
+            }
+            BuildingDamage buildingDamage=new BuildingDamage(building_damage_id,province,city,country,town,village,location,
+                    date,category,basicallyIntactSquare,damagedSquare,destroyedSquare,note,reportingUnit,earthquakeId);
+
+            //这里添加一个编码的代码
+            String result=chinaAdministrtiveService.doBuildingDamageCode(buildingDamage);
+            if (result=="") {
+                //编码时数据格式不正确
+                System.out.println("BuildingDamage encode fail because of the invalid format");
+                return null;
+            } else {
+                buildingDamage.setBuilding_damage_id(result);
+                buildingDamageList.add(buildingDamage);
+            }
+        }
+
+        return buildingDamageList;
     }
 
 }

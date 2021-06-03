@@ -1,6 +1,7 @@
 package com.example.demo.service;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.example.demo.entity.BuildingDamage;
 import com.example.demo.entity.ChinaAdministrative;
 import com.example.demo.entity.Disasterinfo;
 import com.example.demo.entity.DistressedPeople;
@@ -39,6 +40,11 @@ public class ChinaAdministrtiveService {
             exception.printStackTrace();
             return null;
         }
+    }
+
+
+    public String doBuildingDamageCode(BuildingDamage buildingDamage){
+        return "";
     }
 
     /**

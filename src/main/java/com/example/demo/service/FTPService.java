@@ -4,8 +4,10 @@ package com.example.demo.service;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.example.demo.entity.BuildingDamage;
 import com.example.demo.entity.Disasterinfo;
 import com.example.demo.entity.DistressedPeople;
+import com.example.demo.mapper.BuildingDamageMapper;
 import com.example.demo.mapper.DisasterMapper;
 import com.example.demo.mapper.DistressedPeopleMapper;
 import com.example.demo.utility.Ftp;
@@ -32,6 +34,8 @@ public class FTPService {
     private DisasterMapper disasterMapper;
     @Autowired
     private DistressedPeopleMapper distressedPeopleMapper;
+    @Autowired
+    private BuildingDamageMapper buildingDamageMapper;
 
     FTPClient ftp;
 
@@ -47,16 +51,16 @@ public class FTPService {
         MyJSONObject myJSONObject = new MyJSONObject();
         if (connect(ip, user, passwd)) {
             MyJSONObject jsonObject1=saveBasicDisaster();
-//            MyJSONObject jsonObject1=new MyJSONObject();
             MyJSONObject jsonObject2=savePeople();
-            if (jsonObject1.getResultCode()==ResultCode.success&&jsonObject2.getResultCode()==ResultCode.success){
-                jsonObject1.putMsg(jsonObject1.getMsg()+"    "+jsonObject2.getMsg());
+            MyJSONObject jsonObject3=saveBuildingDamage();
+            if (jsonObject1.getResultCode()==ResultCode.success&&jsonObject2.getResultCode()==ResultCode.success&&jsonObject3.getResultCode()==ResultCode.success){
+                jsonObject1.putMsg(jsonObject1.getMsg()+"    "+jsonObject2.getMsg()+"    "+jsonObject3.getMsg());
                 return jsonObject1;
             }
             else {
                 //这边就报错了
                 jsonObject1.putResultCode(ResultCode.fail);
-                jsonObject1.putMsg(jsonObject1.getMsg()+"    "+jsonObject2.getMsg());
+                jsonObject1.putMsg(jsonObject1.getMsg()+"    "+jsonObject2.getMsg()+"    "+jsonObject3.getMsg());
                 return jsonObject1;
             }
         }
@@ -78,7 +82,8 @@ public class FTPService {
                 //这边是设置被动服务
                 ftp.enterLocalPassiveMode();
                 if (FTPReply.isPositiveCompletion(ftp.sendCommand(
-                        "OPTS UTF8", "ON"))) {// 开启服务器对UTF-8的支持，如果服务器支持就用UTF-8编码，否则就使用本地编码（GBK）.
+                        "OPTS UTF8", "ON"))) {
+                    // 开启服务器对UTF-8的支持，如果服务器支持就用UTF-8编码，否则就使用本地编码（GBK）.
                     LOCAL_CHARSET = "UTF-8";
                 }
                 ftp.setControlEncoding(LOCAL_CHARSET);
@@ -186,6 +191,46 @@ public class FTPService {
             e.printStackTrace();
             jsonObject.put("ResultCode", ResultCode.exception);
             jsonObject.put("msg", "connect success, but  people data insert  exception occur");
+            jsonObject.put("data", "0");
+        }
+        return jsonObject;
+    }
+
+//    存储受灾房屋数据
+    public MyJSONObject saveBuildingDamage(){
+        MyJSONObject jsonObject = new MyJSONObject();
+        try {
+            ftp.changeToParentDirectory();
+            // 更改当前工作目录
+            ftp.changeWorkingDirectory("/ftpfile/disaster_data/building damage");
+            InputStream inputStream = ftp.retrieveFileStream("HouseTemplate.json");
+            ftp.completePendingCommand();
+
+            if (inputStream==null){
+                throw new Exception();
+            }
+            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
+            String line;
+            String result = "";
+            while ((line = bufferedReader.readLine()) != null) result += line;
+            //这边的处理有一些变化
+            List<BuildingDamage> buildingDamageList = fileOperation.jsonParseBuildingDamage(result);
+            if (buildingDamageList == null) {
+                jsonObject.put("ResultCode", ResultCode.exception);
+                jsonObject.put("msg", "connect success, but building damage data is invalid or exist");
+                jsonObject.put("data", "0");
+            } else {
+                for (int i = 0; i < buildingDamageList.size(); i++) {
+                    buildingDamageMapper.insert(buildingDamageList.get(i));
+                }
+                jsonObject.put("ResultCode", ResultCode.success);
+                jsonObject.put("msg", "connect success, and building damage data insert success");
+                jsonObject.put("data", "0");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            jsonObject.put("ResultCode", ResultCode.exception);
+            jsonObject.put("msg", "connect success, but building damage data insert  exception occur");
             jsonObject.put("data", "0");
         }
         return jsonObject;
