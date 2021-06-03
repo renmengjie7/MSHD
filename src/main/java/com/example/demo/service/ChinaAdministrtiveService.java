@@ -42,9 +42,9 @@ public class ChinaAdministrtiveService {
     }
 
     /**
-     * 人员伤亡灾情编码
+     *
      * @param distressedPeople
-     * @return code编码成功 null编码失败
+     * @return resCode 0失败 1成功 msg错误信息
      */
     public Map<String,String> doDistressedPeopleCode(DistressedPeople distressedPeople){
         Map<String,String> map = new HashMap<>();
