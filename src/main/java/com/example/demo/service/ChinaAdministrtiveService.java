@@ -77,7 +77,7 @@ public class ChinaAdministrtiveService {
                 float magnitude = selectMagnitude(distressedPeople.getEarthquakeId());
                 if (magnitude == -1) {
                     map.put("resCode", "0");
-                    map.put("msg", "can not find disaster with this EarthquakeId");
+                    map.put("msg", "can not find disaster with this EarthquakeId: "+ distressedPeople.getEarthquakeId());
                 }
                 else {
                     int grade = gradeCalculate(magnitude, distressedPeople.getNumber());
@@ -124,8 +124,10 @@ public class ChinaAdministrtiveService {
         disasterinfoQueryWrapper.last("limit 1");
         try {
             Disasterinfo disasterinfo = disasterMapper.selectOne(disasterinfoQueryWrapper);
-            if(disasterinfo==null)
-                System.out.printf("not find %s\n",earthquakeId);
+            if(disasterinfo==null) {
+                System.out.printf("not find %s\n", earthquakeId);
+                return -1;
+            }
             return disasterinfo.getMagnitude();
         } catch (Exception e) {
             e.printStackTrace();
