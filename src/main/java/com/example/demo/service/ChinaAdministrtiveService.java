@@ -68,7 +68,7 @@ public class ChinaAdministrtiveService {
                 distressedPeople.getVillage());
         if(locationCode==null){
             map.put("resCode","0");
-            map.put("msg","the location can not find code");
+            map.put("msg","the location "+distressedPeople.getProvince()+ distressedPeople.getCity()+ distressedPeople.getCountry()+ distressedPeople.getTown()+ distressedPeople.getVillage()+"can not find code");
         }
         else {
             locationCode = (locationCode+"000000000000").substring(0,12);
