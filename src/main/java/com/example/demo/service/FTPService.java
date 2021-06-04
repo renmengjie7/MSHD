@@ -440,7 +440,7 @@ public class FTPService {
         try {
             ftp.changeToParentDirectory();
             // 更改当前工作目录
-            ftp.changeWorkingDirectory("/ftpfile/disaster_data/secondary");
+            ftp.changeWorkingDirectory("/ftpfile/disaster_data/secondary disaster");
             InputStream inputStream = ftp.retrieveFileStream("SecondTemplate2.json");
             ftp.completePendingCommand();
 
@@ -502,7 +502,7 @@ public class FTPService {
                 "/ftpfile/disaster_data/lifeline disaster",
                 "/ftpfile/disaster_data/building damage",
                 "/ftpfile/disaster_data/forecast",
-                "/ftpfile/disaster_data/secondary",};
+                "/ftpfile/disaster_data/secondary disaster",};
         InputStream inputStream;
         FileOutputStream fileOutputStream;
         try {
