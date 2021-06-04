@@ -10,4 +10,3 @@ create table softwaremanage.forecast
     code      varchar(20)   null
 )
     collate = utf8_bin;
-

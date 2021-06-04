@@ -49,6 +49,79 @@ public class FTPService {
     // FTP协议里面，规定文件名编码为iso-8859-1
     private static String SERVER_CHARSET = "ISO-8859-1";
 
+
+    public JSONObject ftpSaveBasicDisaster(String ip, String user, String passwd){
+        if (connect(ip, user, passwd)) {
+           return saveBasicDisaster();
+        }
+        else {
+            MyJSONObject myJSONObject = new MyJSONObject();
+            myJSONObject.putMsg("connect fail (please check the ip,username,password)");
+            myJSONObject.putResultCode(ResultCode.invalid);
+            return myJSONObject;
+        }
+    }
+
+    public JSONObject ftpSavePeople(String ip, String user, String passwd){
+        if (connect(ip, user, passwd)) {
+            return savePeople();
+        }
+        else {
+            MyJSONObject myJSONObject = new MyJSONObject();
+            myJSONObject.putMsg("connect fail (please check the ip,username,password)");
+            myJSONObject.putResultCode(ResultCode.invalid);
+            return myJSONObject;
+        }
+    }
+
+    public JSONObject ftpSaveBuildingDamage(String ip, String user, String passwd){
+        if (connect(ip, user, passwd)) {
+            return saveBuildingDamage();
+        }
+        else {
+            MyJSONObject myJSONObject = new MyJSONObject();
+            myJSONObject.putMsg("connect fail (please check the ip,username,password)");
+            myJSONObject.putResultCode(ResultCode.invalid);
+            return myJSONObject;
+        }
+    }
+
+    public JSONObject ftpSaveLifelineDisaster(String ip, String user, String passwd){
+        if (connect(ip, user, passwd)) {
+            return saveLifelineDisaster();
+        }
+        else {
+            MyJSONObject myJSONObject = new MyJSONObject();
+            myJSONObject.putMsg("connect fail (please check the ip,username,password)");
+            myJSONObject.putResultCode(ResultCode.invalid);
+            return myJSONObject;
+        }
+    }
+
+    public JSONObject ftpSaveForecast(String ip, String user, String passwd){
+        if (connect(ip, user, passwd)) {
+            return saveForecast();
+        }
+        else {
+            MyJSONObject myJSONObject = new MyJSONObject();
+            myJSONObject.putMsg("connect fail (please check the ip,username,password)");
+            myJSONObject.putResultCode(ResultCode.invalid);
+            return myJSONObject;
+        }
+    }
+
+    public JSONObject ftpSaveSecondaryDisaster(String ip, String user, String passwd){
+        if (connect(ip, user, passwd)) {
+            return saveSecondaryDisaster();
+        }
+        else {
+            MyJSONObject myJSONObject = new MyJSONObject();
+            myJSONObject.putMsg("connect fail (please check the ip,username,password)");
+            myJSONObject.putResultCode(ResultCode.invalid);
+            return myJSONObject;
+        }
+    }
+
     public JSONObject ftpConfig(String ip, String user, String passwd,int interval) {
         MyJSONObject myJSONObject = new MyJSONObject();
         if (connect(ip, user, passwd)) {

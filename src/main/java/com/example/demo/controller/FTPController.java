@@ -31,4 +31,40 @@ public class FTPController {
         return ftpService.ftpConfig(ip, user, passwd,interval);
     }
 
+    @RequestMapping("/ftpSaveBasicDisaster")
+    @ResponseBody
+    public JSONObject ftpSaveBasicDisaster(String ip, String user, String passwd){
+        return ftpService.ftpSaveBasicDisaster(ip,user,passwd);
+    }
+
+    @RequestMapping("/ftpSavePeople")
+    @ResponseBody
+    public JSONObject ftpSavePeople(String ip, String user, String passwd){
+        return ftpService.ftpSavePeople(ip, user, passwd);
+    }
+
+    @RequestMapping("/ftpSaveBuildingDamage")
+    @ResponseBody
+    public JSONObject ftpSaveBuildingDamage(String ip, String user, String passwd){
+        return ftpService.ftpSaveBuildingDamage(ip, user, passwd);
+    }
+
+    @RequestMapping("/ftpSaveLifelineDisaster")
+    @ResponseBody
+    public JSONObject ftpSaveLifelineDisaster(String ip, String user, String passwd){
+        return ftpService.ftpSaveLifelineDisaster(ip, user, passwd);
+    }
+
+    @RequestMapping("/ftpSaveForecast")
+    @ResponseBody
+    public JSONObject ftpSaveForecast(String ip, String user, String passwd){
+        return ftpService.ftpSaveForecast(ip, user, passwd);
+    }
+
+    @RequestMapping("/ftpSaveSecondaryDisaster")
+    @ResponseBody
+    public JSONObject ftpSaveSecondaryDisaster(String ip, String user, String passwd){
+        return ftpService.ftpSaveSecondaryDisaster(ip, user, passwd);
+    }
+
 }
