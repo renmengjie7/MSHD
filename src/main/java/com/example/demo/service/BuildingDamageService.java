@@ -27,12 +27,15 @@ public class BuildingDamageService {
     private BuildingDamageMapper buildingDamageMapper;
 
     //获取某个震情下的数据，给个id，还要能分页，根据地理位置查询
-    public DataVO<BuildingDamage> getBuildingDamageByEarthquakeId(String earthquakeId, String key, int page, int limit){
+    public DataVO<BuildingDamage> getBuildingDamageByEarthquakeId(String earthquakeId, int category, int page, int limit){
         DataVO dataVO = new DataVO();
         dataVO.setCode(0);
         dataVO.setMsg("");
         QueryWrapper<BuildingDamage> queryWrapper = Wrappers.query();
-        queryWrapper.like("location",key);
+        queryWrapper.eq("earthquake_id",earthquakeId);
+        if(category!=-1){
+            queryWrapper.eq("category",category);
+        }
         IPage<BuildingDamage> buildingDamageIPage = new Page<>(page, limit);
         IPage<BuildingDamage> result = buildingDamageMapper.selectPage(buildingDamageIPage, queryWrapper);
         dataVO.setCount(result.getTotal());

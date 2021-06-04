@@ -22,11 +22,8 @@ public class BuildingDamageController {
     //获取某个震情下的数据，给个id，还要能分页，根据地理位置查询
     @RequestMapping("/getBuildingDamageByEarthquakeId")
     @ResponseBody
-    public ResponseEntity getBuildingDamageByEarthquakeId(String earthquakeId, String key, int page, int limit){
-        if(key==null){
-            key="";
-        }
-        return new ResponseEntity<>(buildingDamageService.getBuildingDamageByEarthquakeId(earthquakeId, key, page, limit), HttpStatus.OK);
+    public ResponseEntity getBuildingDamageByEarthquakeId(String earthquakeId, int category, int page, int limit){
+        return new ResponseEntity<>(buildingDamageService.getBuildingDamageByEarthquakeId(earthquakeId, category, page, limit), HttpStatus.OK);
     }
 
     //删除记录

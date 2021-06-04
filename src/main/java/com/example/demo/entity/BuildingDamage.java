@@ -29,9 +29,11 @@ public class BuildingDamage {
     private String note                  ;
     private String reportingUnit        ;
     private String earthquakeId          ;
+    private double slightDamagedSquare;
+    private double moderateDamagedSquare;
+    private double seriousDamagedSquare ;
 
-
-    public BuildingDamage(String buildingDamageId, String province, String city, String country, String town, String village, String location, Timestamp date, int category, double basicallyIntactSquare, double damagedSquare, double destroyedSquare, String note, String reportingUnit, String earthquakeId) {
+    public BuildingDamage(String buildingDamageId, String province, String city, String country, String town, String village, String location, Timestamp date, int category, double basicallyIntactSquare, double damagedSquare, double destroyedSquare, String note, String reportingUnit, String earthquakeId, double slightDamagedSquare, double moderateDamagedSquare, double seriousDamagedSquare) {
         this.buildingDamageId = buildingDamageId;
         this.province = province;
         this.city = city;
@@ -47,5 +49,8 @@ public class BuildingDamage {
         this.note = note;
         this.reportingUnit = reportingUnit;
         this.earthquakeId = earthquakeId;
+        this.slightDamagedSquare = slightDamagedSquare;
+        this.moderateDamagedSquare = moderateDamagedSquare;
+        this.seriousDamagedSquare = seriousDamagedSquare;
     }
 }

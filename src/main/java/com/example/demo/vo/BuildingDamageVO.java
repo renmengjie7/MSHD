@@ -26,4 +26,7 @@ public class BuildingDamageVO {
     private String note                  ;
     private String reportingUnit        ;
     private String earthquakeId          ;
+    private double slightDamagedSquare;
+    private double moderateDamagedSquare;
+    private double seriousDamagedSquare ;
 }

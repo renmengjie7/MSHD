@@ -223,7 +223,7 @@ public class FTPService {
                     }
                     filename=disasterinfos.get(i).getId()+"."+disasterinfos.get(i).getPicture().split("\\.")[1];
                     path+=filename;
-                    getFileByFtp(disasterinfos.get(i).getPicture(),path);
+                    getFileByFtp(disasterinfos.get(i).getPicture(),path,0);
                     UpdateWrapper<Disasterinfo> disasterinfoUpdateWrapper= Wrappers.update();
                     disasterinfoUpdateWrapper.eq("id",disasterinfos.get(i).getId());
                     disasterinfos.get(i).setPicture(filename);
@@ -360,20 +360,20 @@ public class FTPService {
                     }
                     filename=lifelineDisasters.get(i).getId()+"."+lifelineDisasters.get(i).getPicture().split("\\.")[1];
                     path+=filename;
-                    getFileByFtp(lifelineDisasters.get(i).getPicture(),path);
+                    getFileByFtp(lifelineDisasters.get(i).getPicture(),path,2);
                     UpdateWrapper<LifelineDisaster> lifelineDisasterUpdateWrapper= Wrappers.update();
                     lifelineDisasterUpdateWrapper.eq("id",lifelineDisasters.get(i).getId());
                     lifelineDisasters.get(i).setPicture(filename);
                     lifelineDisasterMapper.update(lifelineDisasters.get(i),lifelineDisasterUpdateWrapper);
                 }
                 jsonObject.put("ResultCode", ResultCode.success);
-                jsonObject.put("msg", "connect success, and basic disaster insert success");
+                jsonObject.put("msg", "connect success, and lifeline Disaster insert success");
                 jsonObject.put("data", "0");
             }
         } catch (Exception e) {
             e.printStackTrace();
             jsonObject.put("ResultCode", ResultCode.exception);
-            jsonObject.put("msg", "connect success, but basic disaster insert exception occur");
+            jsonObject.put("msg", "connect success, but lifeline Disaster insert exception occur");
             jsonObject.put("data", "0");
         }
         return jsonObject;
@@ -415,7 +415,7 @@ public class FTPService {
                     }
                     filename=forecasts.get(i).getId()+"."+forecasts.get(i).getPicture().split("\\.")[1];
                     path+=filename;
-                    getFileByFtp(forecasts.get(i).getPicture(),path);
+                    getFileByFtp(forecasts.get(i).getPicture(),path,4);
                     UpdateWrapper<Forecast> forecastUpdateWrapper= Wrappers.update();
                     forecastUpdateWrapper.eq("id",forecasts.get(i).getId());
                     forecasts.get(i).setPicture(filename);
@@ -440,7 +440,7 @@ public class FTPService {
         try {
             ftp.changeToParentDirectory();
             // 更改当前工作目录
-            ftp.changeWorkingDirectory("/ftpfile/disaster_data/secondary disaster");
+            ftp.changeWorkingDirectory("/ftpfile/disaster_data/secondary");
             InputStream inputStream = ftp.retrieveFileStream("SecondTemplate2.json");
             ftp.completePendingCommand();
 
@@ -464,14 +464,14 @@ public class FTPService {
                     secondaryDisasterMapper.insert(secondaryDisasters.get(i));
                     //对每一个，需要找到文件，存起来
                     //若目标文件夹不存在，则创建
-                    String path=mainPath+"lifeline/";
+                    String path=mainPath+"secondary/";
                     File upload = new File(path);
                     if (!upload.exists()) {
                         upload.mkdirs();
                     }
                     filename=secondaryDisasters.get(i).getId()+"."+secondaryDisasters.get(i).getPicture().split("\\.")[1];
                     path+=filename;
-                    getFileByFtp(secondaryDisasters.get(i).getPicture(),path);
+                    getFileByFtp(secondaryDisasters.get(i).getPicture(),path,5);
                     UpdateWrapper<SecondaryDisaster> secondaryDisasterUpdateWrapper= Wrappers.update();
                     secondaryDisasterUpdateWrapper.eq("id",secondaryDisasters.get(i).getId());
                     secondaryDisasters.get(i).setPicture(filename);
@@ -496,12 +496,18 @@ public class FTPService {
      * @param remotePath
      * @param localPath
      */
-    public void getFileByFtp(String remotePath, String localPath)  {
+    public void getFileByFtp(String remotePath, String localPath,int type)  {
+        String[] directory={"/ftpfile/disaster_data/basic_earthquake",
+                "/ftpfile/disaster_data/casualties and missing persons",
+                "/ftpfile/disaster_data/lifeline disaster",
+                "/ftpfile/disaster_data/building damage",
+                "/ftpfile/disaster_data/forecast",
+                "/ftpfile/disaster_data/secondary",};
         InputStream inputStream;
         FileOutputStream fileOutputStream;
         try {
             ftp.changeToParentDirectory();
-            ftp.changeWorkingDirectory("/ftpfile/disaster_data/basic_earthquake");
+            ftp.changeWorkingDirectory(directory[type]);
             fileOutputStream=new FileOutputStream(localPath);
             inputStream=ftp.retrieveFileStream(remotePath);
             byte[] b = new byte[1024];

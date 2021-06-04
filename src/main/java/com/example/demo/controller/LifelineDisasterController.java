@@ -20,18 +20,15 @@ public class LifelineDisasterController {
     //获取某个震情下的数据，给个id，还要能分页，根据地理位置查询
     @RequestMapping("/getLifelineDisasterByEarthquakeId")
     @ResponseBody
-    public ResponseEntity getLifelineDisasterByEarthquakeId(String earthquakeId, String key, int page, int limit){
-        if(key==null){
-            key="";
-        }
-        return new ResponseEntity<>(lifelineDisasterService.getLifelineDisasterByEarthquakeId(earthquakeId, key, page, limit), HttpStatus.OK);
+    public ResponseEntity getLifelineDisasterByEarthquakeId(String earthquakeId, int category, int page, int limit){
+        return new ResponseEntity<>(lifelineDisasterService.getLifelineDisasterByEarthquakeId(earthquakeId, category, page, limit), HttpStatus.OK);
     }
 
     //删除记录
     //根据ID删除某个数据
-    @DeleteMapping("/deleteSecondaryDisasterById")
+    @DeleteMapping("/deleteLifelineDisasterById")
     @ResponseBody
-    public JSONObject deleteSecondaryDisasterById(String id) {
+    public JSONObject deleteLifelineDisasterById(String id) {
         return lifelineDisasterService.deleteLifelineDisasterById(id);
     }
 

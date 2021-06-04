@@ -3,8 +3,8 @@ spring:
     static-locations: file:/root/softwaremanage/static/
   datasource:
     username: root
-#    password: Aa-123456
-    password: 123
+    password: Aa-123456
+#    password: 123
     url: jdbc:mysql://localhost:3306/softwaremanage?serverTimezone=UTC&useUnicode=true&characterEncoding=utf-8
   thymeleaf:
     prefix: classpath:/templates/

@@ -238,7 +238,6 @@ public class FileOperation {
         for (int i = 0; i < infos.size(); i++) {
             org.json.JSONObject info = new org.json.JSONObject(infos.get(i).toString());
 
-
             String peopleId="";
             String province=info.getString("province");
             String city=info.getString("city");
@@ -267,7 +266,6 @@ public class FileOperation {
             }
             DistressedPeople distressedPeople=new DistressedPeople(peopleId,province,city,country,town,village,location,date,number,category,reportingUnit,earthquakeId);
 
-            //这里添加一个编码的代码
             //这里添加一个编码的代码
             Map<String,String> map=chinaAdministrtiveService.doDistressedPeopleCode(distressedPeople);
             if (map.get("resCode")=="0") {
@@ -452,7 +450,6 @@ public class FileOperation {
             String reportingUnit=info.getString("reportingUnit");
             String earthquakeId=info.getString("earthquakeId");
             double basicallyIntactSquare=Double.parseDouble(info.getString("basicallyIntactSquare"));
-            double damagedSquare=Double.parseDouble(info.getString("damagedSquare"));
             double destroyedSquare=Double.parseDouble(info.getString("destroyedSquare"));
             int category;
             String cate=info.getString("category");
@@ -475,12 +472,30 @@ public class FileOperation {
                 default:
                     category=0;
             }
+            double damagedSquare=0;
+            if(info.has("damagedSquare")){
+                damagedSquare=Double.parseDouble(info.getString("damagedSquare"));
+            }
+
+            double slightDamagedSquare=0;
+            if(info.has("slightDamagedSquare")){
+                slightDamagedSquare=Double.parseDouble(info.getString("slightDamagedSquare"));
+            }
+            double moderateDamagedSquare=0;
+            if(info.has("moderateDamagedSquare")){
+                moderateDamagedSquare=Double.parseDouble(info.getString("moderateDamagedSquare"));
+            }
+            double seriousDamagedSquare=0;
+            if(info.has("seriousDamagedSquare")){
+                seriousDamagedSquare=Double.parseDouble(info.getString("seriousDamagedSquare"));
+            }
+
             BuildingDamage buildingDamage=new BuildingDamage(building_damage_id,province,city,country,town,village,location,
-                    date,category,basicallyIntactSquare,damagedSquare,destroyedSquare,note,reportingUnit,earthquakeId);
+                    date,category,basicallyIntactSquare,damagedSquare,destroyedSquare,note,reportingUnit,earthquakeId,slightDamagedSquare,moderateDamagedSquare,seriousDamagedSquare);
 
             //这里添加一个编码的代码
             String result=chinaAdministrtiveService.doBuildingDamageCode(buildingDamage);
-            if (result=="") {
+            if (result==null) {
                 //编码时数据格式不正确
                 System.out.println("BuildingDamage encode fail because of the invalid format");
                 return null;
@@ -512,7 +527,7 @@ public class FileOperation {
 
             //这里添加一个编码的代码
             String result=chinaAdministrtiveService.doForecastCode(forecast);
-            if (result=="") {
+            if (result==null) {
                 //编码时数据格式不正确
                 System.out.println("forecast encode fail because of the invalid format");
                 return null;
@@ -521,7 +536,6 @@ public class FileOperation {
                 forecasts.add(forecast);
             }
         }
-
         return forecasts;
     }
 

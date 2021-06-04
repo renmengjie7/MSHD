@@ -27,12 +27,15 @@ public class SecondaryDisasterService {
     private SecondaryDisasterMapper secondaryDisasterMapper;
     
     //获取某个震情下的数据，给个id，还要能分页，根据地理位置查询
-    public DataVO<SecondaryDisaster> getSecondaryDisasterByEarthquakeId(String earthquakeId, String key, int page, int limit){
+    public DataVO<SecondaryDisaster> getSecondaryDisasterByEarthquakeId(String earthquakeId, int category, int page, int limit){
         DataVO dataVO = new DataVO();
         dataVO.setCode(0);
         dataVO.setMsg("");
         QueryWrapper<SecondaryDisaster> queryWrapper = Wrappers.query();
-        queryWrapper.like("location",key);
+        queryWrapper.eq("earthquake_id",earthquakeId);
+        if(category!=-1){
+            queryWrapper.eq("category",category);
+        }
         IPage<SecondaryDisaster> secondaryDisasterIPage = new Page<>(page, limit);
         IPage<SecondaryDisaster> result = secondaryDisasterMapper.selectPage(secondaryDisasterIPage, queryWrapper);
         dataVO.setCount(result.getTotal());

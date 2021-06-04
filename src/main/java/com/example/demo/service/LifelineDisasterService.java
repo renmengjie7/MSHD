@@ -26,12 +26,15 @@ public class LifelineDisasterService{
     private LifelineDisasterMapper lifelineDisasterMapper;
 
     //获取某个震情下的数据，给个id，还要能分页，根据地理位置查询
-    public DataVO<LifelineDisaster> getLifelineDisasterByEarthquakeId(String earthquakeId, String key, int page, int limit){
+    public DataVO<LifelineDisaster> getLifelineDisasterByEarthquakeId(String earthquakeId, int category, int page, int limit){
         DataVO dataVO = new DataVO();
         dataVO.setCode(0);
         dataVO.setMsg("");
         QueryWrapper<LifelineDisaster> queryWrapper = Wrappers.query();
-        queryWrapper.like("location",key);
+        queryWrapper.eq("earthquake_id",earthquakeId);
+        if(category!=-1){
+            queryWrapper.eq("category",category);
+        }
         IPage<LifelineDisaster> lifelineDisasterIPage = new Page<>(page, limit);
         IPage<LifelineDisaster> result = lifelineDisasterMapper.selectPage(lifelineDisasterIPage, queryWrapper);
         dataVO.setCount(result.getTotal());

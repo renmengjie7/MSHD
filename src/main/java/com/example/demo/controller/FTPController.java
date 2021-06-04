@@ -49,6 +49,7 @@ public class FTPController {
         return ftpService.ftpSaveBuildingDamage(ip, user, passwd);
     }
 
+    //    A JSONObject text must begin with '{' at 1 [character 2 line 1]
     @RequestMapping("/ftpSaveLifelineDisaster")
     @ResponseBody
     public JSONObject ftpSaveLifelineDisaster(String ip, String user, String passwd){
