@@ -36,6 +36,8 @@ public class FTPService {
     private LifelineDisasterMapper lifelineDisasterMapper;
     @Autowired
     private SecondaryDisasterMapper secondaryDisasterMapper;
+    @Autowired
+    private ForecastMapper forecastMapper;
 
     FTPClient ftp;
 
@@ -55,18 +57,24 @@ public class FTPService {
             MyJSONObject jsonObject3=saveBuildingDamage();
             MyJSONObject jsonObject4=saveLifelineDisaster();
             MyJSONObject jsonObject5=saveSecondaryDisaster();
+            MyJSONObject jsonObject6=saveForecast();
+
             if (jsonObject1.getResultCode()==ResultCode.success
                     &&jsonObject2.getResultCode()==ResultCode.success
                     &&jsonObject3.getResultCode()==ResultCode.success
                     &&jsonObject4.getResultCode()==ResultCode.success
-                    &&jsonObject5.getResultCode()==ResultCode.success){
-                jsonObject1.putMsg(jsonObject1.getMsg()+"    "+jsonObject2.getMsg()+"    "+jsonObject3.getMsg());
+                    &&jsonObject5.getResultCode()==ResultCode.success
+                    &&jsonObject6.getResultCode()==ResultCode.success){
+
+                jsonObject1.putMsg(jsonObject1.getMsg()+"    "+jsonObject2.getMsg()+"    "+jsonObject3.getMsg()
+                                    +"    "+jsonObject4.getMsg()+"    "+jsonObject5.getMsg()+"    "+jsonObject6.getMsg());
                 return jsonObject1;
             }
             else {
                 //这边就报错了
                 jsonObject1.putResultCode(ResultCode.fail);
-                jsonObject1.putMsg(jsonObject1.getMsg()+"    "+jsonObject2.getMsg()+"    "+jsonObject3.getMsg());
+                jsonObject1.putMsg(jsonObject1.getMsg()+"    "+jsonObject2.getMsg()+"    "+jsonObject3.getMsg()
+                                    +"    "+jsonObject1.getMsg()+"    "+jsonObject2.getMsg()+"    "+jsonObject3.getMsg());
                 return jsonObject1;
             }
         }
@@ -241,7 +249,6 @@ public class FTPService {
         return jsonObject;
     }
 
-
     //存储生命线灾情
     public MyJSONObject saveLifelineDisaster(){
         MyJSONObject jsonObject = new MyJSONObject();
@@ -299,6 +306,60 @@ public class FTPService {
         return jsonObject;
     }
 
+    public MyJSONObject saveForecast(){
+        MyJSONObject jsonObject = new MyJSONObject();
+        try {
+            ftp.changeToParentDirectory();
+            // 更改当前工作目录
+            ftp.changeWorkingDirectory("/ftpfile/disaster_data/forecast");
+            InputStream inputStream = ftp.retrieveFileStream("PredictionTemplate.json");
+            ftp.completePendingCommand();
+
+            if (inputStream==null){
+                throw new Exception();
+            }
+
+            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
+            String line;
+            String result = "";
+            while ((line = bufferedReader.readLine()) != null) result += line;
+            List<Forecast> forecasts = fileOperation.jsonParseForecast(result);
+            if (forecasts == null) {
+                jsonObject.put("ResultCode", ResultCode.exception);
+                jsonObject.put("msg", "connect success, but forecast data is invalid or exist");
+                jsonObject.put("data", "0");
+            } else {
+                //拼接子路径
+                String filename="";
+                for (int i = 0; i < forecasts.size(); i++) {
+                    forecastMapper.insert(forecasts.get(i));
+                    //对每一个，需要找到文件，存起来
+                    //若目标文件夹不存在，则创建
+                    String path=mainPath+"forecast/";
+                    File upload = new File(path);
+                    if (!upload.exists()) {
+                        upload.mkdirs();
+                    }
+                    filename=forecasts.get(i).getId()+"."+forecasts.get(i).getPicture().split("\\.")[1];
+                    path+=filename;
+                    getFileByFtp(forecasts.get(i).getPicture(),path);
+                    UpdateWrapper<Forecast> forecastUpdateWrapper= Wrappers.update();
+                    forecastUpdateWrapper.eq("id",forecasts.get(i).getId());
+                    forecasts.get(i).setPicture(filename);
+                    forecastMapper.update(forecasts.get(i),forecastUpdateWrapper);
+                }
+                jsonObject.put("ResultCode", ResultCode.success);
+                jsonObject.put("msg", "connect success, and forecast insert success");
+                jsonObject.put("data", "0");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            jsonObject.put("ResultCode", ResultCode.exception);
+            jsonObject.put("msg", "connect success, but forecast insert exception occur");
+            jsonObject.put("data", "0");
+        }
+        return jsonObject;
+    }
 
     //存储二次灾害
     public MyJSONObject saveSecondaryDisaster(){

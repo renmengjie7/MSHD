@@ -494,5 +494,36 @@ public class FileOperation {
         return buildingDamageList;
     }
 
+    //解析受灾房屋
+    public List<Forecast> jsonParseForecast(String content) {
+        List<Forecast> forecasts = new ArrayList<>();
+        //逻辑处理，存入数据库，需要判断是否重复
+        org.json.JSONObject data = new org.json.JSONObject(content);
+        org.json.JSONObject disasterInfo = new org.json.JSONObject(data.get("disasterInfo").toString());
+        JSONArray infos = JSONArray.fromObject(disasterInfo.get("info").toString());
+        for (int i = 0; i < infos.size(); i++) {
+            org.json.JSONObject info = new org.json.JSONObject(infos.get(i).toString());
+
+            int grade=Integer.parseInt(info.getString("grade"));
+            int intensity=Integer.parseInt(info.getString("intensity"));
+            int type=Integer.parseInt(info.getString("type"));
+            String picture=info.getString("picture");
+            Timestamp date=Timestamp.valueOf(info.getString("date"));
+            Forecast forecast=new Forecast(date,grade,intensity,type,picture);
+
+            //这里添加一个编码的代码
+            String result=chinaAdministrtiveService.doForecastCode(forecast);
+            if (result=="") {
+                //编码时数据格式不正确
+                System.out.println("forecast encode fail because of the invalid format");
+                return null;
+            } else {
+                forecast.setCode(result);
+                forecasts.add(forecast);
+            }
+        }
+
+        return forecasts;
+    }
 
 }

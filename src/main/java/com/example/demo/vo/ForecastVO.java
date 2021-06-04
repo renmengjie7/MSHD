@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class ForecastVO {
     private int id;
+    private String code;
     private String date;
     private int grade;
     private int intensity;

@@ -52,6 +52,11 @@ public class ChinaAdministrtiveService {
         return "";
     }
 
+    public String doForecastCode(Forecast forecast){
+        return "";
+    }
+
+
     /**
      *
      * @param distressedPeople
