@@ -339,13 +339,13 @@ public class FileOperation {
                     category=0;
             }
             LifelineDisaster lifelineDisaster=new LifelineDisaster(lifelineId,province,city,country,town,village,location,date,note,category,grade,type, picture,reportingUnit,earthquakeId);
-            String code=chinaAdministrtiveService.doLifelineDisasterCode(lifelineDisaster);
-           if (code == null) {
+            Map<String,String> map=chinaAdministrtiveService.doLifelineDisasterCode(lifelineDisaster);
+            if (map.get("resCode")=="0") {
                 //编码时数据格式不正确
                 System.out.println("编码时数据格式不正确");
                 return null;
             } else {
-                lifelineDisaster.setLifelineId(code);
+                lifelineDisaster.setLifelineId(map.get("msg"));
                 lifelineDisasters.add(lifelineDisaster);
             }
         }
@@ -414,13 +414,13 @@ public class FileOperation {
             }
             SecondaryDisaster secondaryDisaster=new SecondaryDisaster(secondaryId,province,city,country,town,village,location,
                     date,category,type,status,picture,reportingUnit,note,earthquakeId);
-            String code=chinaAdministrtiveService.doSecondaryDisasterCode(secondaryDisaster);
-            if (code == null) {
+            Map<String,String> map=chinaAdministrtiveService.doSecondaryDisasterCode(secondaryDisaster);
+            if (map.get("resCode")=="0") {
                 //编码时数据格式不正确
                 System.out.println("编码时数据格式不正确");
                 return null;
             } else {
-                secondaryDisaster.setSecondaryId(code);
+                secondaryDisaster.setSecondaryId(map.get("msg"));
                 secondaryDisasters.add(secondaryDisaster);
             }
         }
@@ -494,13 +494,13 @@ public class FileOperation {
                     date,category,basicallyIntactSquare,damagedSquare,destroyedSquare,note,reportingUnit,earthquakeId,slightDamagedSquare,moderateDamagedSquare,seriousDamagedSquare);
 
             //这里添加一个编码的代码
-            String result=chinaAdministrtiveService.doBuildingDamageCode(buildingDamage);
-            if (result==null) {
+            Map<String,String> map=chinaAdministrtiveService.doBuildingDamageCode(buildingDamage);
+            if (map.get("resCode")=="0") {
                 //编码时数据格式不正确
                 System.out.println("BuildingDamage encode fail because of the invalid format");
                 return null;
             } else {
-                buildingDamage.setBuildingDamageId(result);
+                buildingDamage.setBuildingDamageId(map.get("msg"));
                 buildingDamageList.add(buildingDamage);
             }
         }
@@ -526,15 +526,16 @@ public class FileOperation {
             Forecast forecast=new Forecast(date,grade,intensity,type,picture);
 
             //这里添加一个编码的代码
-            String result=chinaAdministrtiveService.doForecastCode(forecast);
-            if (result==null) {
-                //编码时数据格式不正确
-                System.out.println("forecast encode fail because of the invalid format");
-                return null;
-            } else {
-                forecast.setCode(result);
-                forecasts.add(forecast);
-            }
+//            String result=chinaAdministrtiveService.doForecastCode(forecast);
+//            if (result==null) {
+//                //编码时数据格式不正确
+//                System.out.println("forecast encode fail because of the invalid format");
+//                return null;
+//            } else {
+//                forecast.setCode(result);
+//                forecasts.add(forecast);
+//            }
+            forecasts.add(forecast);
         }
         return forecasts;
     }

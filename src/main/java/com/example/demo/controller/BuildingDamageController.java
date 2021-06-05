@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.sql.Timestamp;
+
 
 @RestController
 public class BuildingDamageController {
@@ -33,5 +35,52 @@ public class BuildingDamageController {
     public JSONObject deleteBuildingDamageById(String id) {
         return buildingDamageService.deleteBuildingDamageById(id);
     }
+
+    //增加房屋灾情信息
+    @RequestMapping("/addBuildingDamage")
+    @ResponseBody
+    public JSONObject addBuildingDamage(String province,
+                                        String city,
+                                        String country,
+                                        String town,
+                                        String village,
+                                        String date,
+                                        int category,
+                                        Double basicallyIntactSquare,
+                                        Double damagedSquare,
+                                        Double destroyedSquare,
+                                        String note,
+                                        String reportingUnit,
+                                        String earthquakeId,
+                                        Double slightDamagedSquare,
+                                        Double moderateDamagedSquare,
+                                        Double seriousDamagedSquare){
+        return buildingDamageService.addBuildingDamage(province,city,country,town,village,date,note,category,basicallyIntactSquare, damagedSquare,destroyedSquare,reportingUnit,earthquakeId,slightDamagedSquare,moderateDamagedSquare,seriousDamagedSquare);
+    }
+
+    //修改房屋破坏灾情信息
+    @RequestMapping("/updateBuildingDamage")
+    @ResponseBody
+    public JSONObject updateBuildingDamage(int id,
+                                           String province,
+                                           String city,
+                                           String country,
+                                           String town,
+                                           String village,
+                                           String date,
+                                           int category,
+                                           Double basicallyIntactSquare,
+                                           Double damagedSquare,
+                                           Double destroyedSquare,
+                                           String note,
+                                           String reportingUnit,
+                                           String earthquakeId,
+                                           Double slightDamagedSquare,
+                                           Double moderateDamagedSquare,
+                                           Double seriousDamagedSquare){
+        return buildingDamageService.updateBuildingDamage(id,province,city,country,town,village,date,note,category,basicallyIntactSquare, damagedSquare,destroyedSquare,reportingUnit,earthquakeId,slightDamagedSquare,moderateDamagedSquare,seriousDamagedSquare);
+
+    }
+
 
 }

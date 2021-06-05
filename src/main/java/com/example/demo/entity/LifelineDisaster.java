@@ -48,4 +48,14 @@ public class LifelineDisaster {
         this.reportingUnit = reportingUnit;
         this.earthquakeId = earthquakeId;
     }
+
+    public LifelineDisaster(String province, String city, String country, String town, String village, int category, int grade) {
+        this.province = province;
+        this.city = city;
+        this.country = country;
+        this.town = town;
+        this.village = village;
+        this.category = category;
+        this.grade = grade;
+    }
 }

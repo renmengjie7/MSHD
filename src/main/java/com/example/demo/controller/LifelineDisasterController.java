@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.sql.Timestamp;
+
 @RestController
 public class LifelineDisasterController {
     @Autowired
@@ -31,5 +33,46 @@ public class LifelineDisasterController {
     public JSONObject deleteLifelineDisasterById(String id) {
         return lifelineDisasterService.deleteLifelineDisasterById(id);
     }
+
+    //增加生命线灾情信息
+    @RequestMapping("/addLifeLineDisaster")
+    @ResponseBody
+    public JSONObject addLifeLineDisaster(String province,
+                                          String city,
+                                          String country,
+                                          String town,
+                                          String village,
+                                          String date,
+                                          String note,
+                                          int category,
+                                          int grade,
+                                          int type,
+                                          String picture,
+                                          String reportingUnit,
+                                          String earthquakeId){
+        return lifelineDisasterService.addLifeLineDisaster(province,city,country,town,village,date,note,category,grade,type,picture,reportingUnit,earthquakeId);
+    }
+
+    //修改生命线灾情信息
+    @RequestMapping("/updateLifeLineDisaster")
+    @ResponseBody
+    public JSONObject updateLifeLineDisaster(int id,
+                                          String province,
+                                          String city,
+                                          String country,
+                                          String town,
+                                          String village,
+                                          String date,
+                                          String note,
+                                          int category,
+                                          int grade,
+                                          int type,
+                                          String picture,
+                                          String reportingUnit,
+                                          String earthquakeId){
+        return lifelineDisasterService.updateLifeLineDisaster(id,province,city,country,town,village,date,note,category,grade,type,picture,reportingUnit,earthquakeId);
+    }
+
+
 
 }

@@ -48,4 +48,14 @@ public class SecondaryDisaster {
         this.note = note;
         this.earthquakeId = earthquakeId;
     }
+
+    public SecondaryDisaster(String province, String city, String country, String town, String village, int category, int status) {
+        this.province = province;
+        this.city = city;
+        this.country = country;
+        this.town = town;
+        this.village = village;
+        this.category = category;
+        this.status = status;
+    }
 }

@@ -9,6 +9,7 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.example.demo.entity.Forecast;
 import com.example.demo.entity.LifelineDisaster;
+import com.example.demo.entity.SecondaryDisaster;
 import com.example.demo.mapper.ForecastMapper;
 import com.example.demo.utility.MyJSONObject;
 import com.example.demo.utility.ResultCode;
@@ -19,8 +20,10 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class ForecastService {
@@ -67,4 +70,63 @@ public class ForecastService {
         return myJSONObject;
     }
 
+    //增加
+    public JSONObject addForecast(String date, int grade, int intensity, int type, String picture) {
+        MyJSONObject myJSONObject=new MyJSONObject();
+        Timestamp timestamp=null;
+        try{
+            timestamp=Timestamp.valueOf(date);
+        }
+        catch (Exception e){
+            e.printStackTrace();
+        }
+        Forecast forecast=new Forecast(timestamp,grade,intensity,type,picture);
+        try {
+            if((forecastMapper.insert(forecast))==0){
+                myJSONObject.putMsg("add forecast info fail");
+                myJSONObject.putResultCode(ResultCode.exception);
+            }
+            else {
+                myJSONObject.putMsg("add forecast info success");
+                myJSONObject.putResultCode(ResultCode.success);
+            }
+        }catch (Exception e){
+            myJSONObject.putResultCode(ResultCode.exception);
+            myJSONObject.putMsg(e.toString());
+        }
+        return myJSONObject;
+    }
+
+    //更新
+    public JSONObject updateForecast(int id, String date, int grade, int intensity, int type, String picture) {
+        MyJSONObject myJSONObject=new MyJSONObject();
+        //根据ID判断数据表中是否存在该条数据
+        Forecast forecast=forecastMapper.selectById(id);
+        if(forecast==null){
+            myJSONObject.putResultCode(ResultCode.invalid);
+            myJSONObject.putMsg("can not find forecast data with the id");
+            return myJSONObject;
+        }
+        Timestamp timestamp=null;
+        try{
+            timestamp=Timestamp.valueOf(date);
+        }
+        catch (Exception e){
+            e.printStackTrace();
+        }
+        //对更新后的灾害信息进行编码
+        forecast=new Forecast(timestamp,grade,intensity,type,picture);
+        UpdateWrapper updateWrapper=new UpdateWrapper();
+        updateWrapper.eq("id",id);
+        if(forecastMapper.update(forecast,updateWrapper)==0)
+        {
+            myJSONObject.putResultCode(ResultCode.exception);
+            myJSONObject.putMsg("update fail");
+        }
+        else{
+            myJSONObject.putResultCode(ResultCode.success);
+            myJSONObject.putMsg("update success");
+        }
+        return myJSONObject;
+    }
 }

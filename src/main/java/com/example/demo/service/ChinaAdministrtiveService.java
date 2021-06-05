@@ -40,20 +40,117 @@ public class ChinaAdministrtiveService {
     }
 
 
-    public String doBuildingDamageCode(BuildingDamage buildingDamage){
-        return "";
+    //房屋编码
+    public Map<String,String> doBuildingDamageCode(BuildingDamage buildingDamage){
+        Map<String,String> map = new HashMap<>();
+        String locationCode,messageCode;
+        //根据地理位置信息找到code
+        locationCode=findCode(buildingDamage.getProvince(),
+                buildingDamage.getCity(),
+                buildingDamage.getCountry(),
+                buildingDamage.getTown(),
+                buildingDamage.getVillage());
+        if(locationCode==null){
+            map.put("resCode","0");
+            map.put("msg","the location "+buildingDamage.getProvince()+ buildingDamage.getCity()+ buildingDamage.getCountry()+ buildingDamage.getTown()+ buildingDamage.getVillage()+"can not find code");
+        }
+        else {
+            locationCode = (locationCode+"000000000000").substring(0,12);
+            //灾情信息编码
+            //0土木 1砖木 2砖混 3框架 4其他
+            int category=buildingDamage.getCategory();
+            if(category==0||category==1||category==2||category==3||category==4) {
+                float magnitude = selectMagnitude(buildingDamage.getEarthquakeId());
+                if (magnitude == -1) {
+                    map.put("resCode", "0");
+                    map.put("msg", "can not find disaster with this EarthquakeId: "+ buildingDamage.getEarthquakeId());
+                }
+                else {
+                    int grade =gradeCalculate(magnitude,(buildingDamage.getDamagedSquare()+buildingDamage.getDestroyedSquare())/2,1);
+                    messageCode = "55"
+                            + (buildingDamage.getCategory() + 1)
+                            + String.format("%03d", buildingDamage.getId())
+                            + grade;
+                    map.put("resCode", "1");
+                    map.put("msg", locationCode + messageCode);
+                }
+            }
+            else {//类别不正确
+                map.put("resCode","0");
+                map.put("msg","the category is incorrect");
+            }
+        }
+        return map;
     }
 
-    public String doLifelineDisasterCode(LifelineDisaster lifelineDisaster){
-        return "";
+    //地理位置编码+33+category+id+grade 3405210000003310001
+    public Map<String,String> doLifelineDisasterCode(LifelineDisaster lifelineDisaster){
+        Map<String,String> map = new HashMap<>();
+        String locationCode,messageCode;
+        //根据地理位置信息找到code
+        locationCode=findCode(lifelineDisaster.getProvince(),
+                lifelineDisaster.getCity(),
+                lifelineDisaster.getCountry(),
+                lifelineDisaster.getTown(),
+                lifelineDisaster.getVillage());
+        if(locationCode==null){
+            map.put("resCode","0");
+            map.put("msg","the location "+lifelineDisaster.getProvince()+ lifelineDisaster.getCity()+ lifelineDisaster.getCountry()+ lifelineDisaster.getTown()+ lifelineDisaster.getVillage()+"can not find code");
+        }
+        else {
+            locationCode = (locationCode+"000000000000").substring(0,12);
+            //灾情信息编码
+            int category=lifelineDisaster.getCategory();//0交通 1供水 2输油 3燃气 4电力 5通信 6水利
+            if(category==0||category==1||category==2||category==3||category==4||category==5||category==6) {
+                int grade =lifelineDisaster.getGrade();
+                messageCode = "33"
+                        + (lifelineDisaster.getCategory() + 1)
+                        + String.format("%03d", lifelineDisaster.getId())
+                        + grade;
+                map.put("resCode", "1");
+                map.put("msg", locationCode + messageCode);
+            }
+            else {//类别不正确
+                map.put("resCode","0");
+                map.put("msg","the category is incorrect");
+            }
+        }
+        return map;
     }
 
-    public String doSecondaryDisasterCode(SecondaryDisaster secondaryDisaster){
-        return "";
-    }
-
-    public String doForecastCode(Forecast forecast){
-        return "";
+    //地理位置编码+44+category+id+status
+    public Map<String,String> doSecondaryDisasterCode(SecondaryDisaster secondaryDisaster){
+        Map<String,String> map = new HashMap<>();
+        String locationCode,messageCode;
+        //根据地理位置信息找到code
+        locationCode=findCode(secondaryDisaster.getProvince(),
+                secondaryDisaster.getCity(),
+                secondaryDisaster.getCountry(),
+                secondaryDisaster.getTown(),
+                secondaryDisaster.getVillage());
+        if(locationCode==null){
+            map.put("resCode","0");
+            map.put("msg","the location "+secondaryDisaster.getProvince()+secondaryDisaster.getCity()+secondaryDisaster.getCountry()+secondaryDisaster.getTown()+secondaryDisaster.getVillage()+"can not find code");
+        }
+        else {
+            locationCode = (locationCode+"000000000000").substring(0,12);
+            //灾情信息编码
+            int category=secondaryDisaster.getCategory();//0崩塌 1滑坡 2泥石流 3岩溶塌陷 4地裂缝 5地面沉降 6其他
+            if(category==0||category==1||category==2||category==3||category==4||category==5||category==6) {
+                int status =secondaryDisaster.getStatus();
+                messageCode = "44"
+                        + (category+ 1)
+                        + String.format("%03d", secondaryDisaster.getId())
+                        + status;
+                map.put("resCode", "1");
+                map.put("msg", locationCode + messageCode);
+            }
+            else {//类别不正确
+                map.put("resCode","0");
+                map.put("msg","the category is incorrect");
+            }
+        }
+        return map;
     }
 
 
@@ -66,7 +163,7 @@ public class ChinaAdministrtiveService {
         Map<String,String> map = new HashMap<>();
         String locationCode,messageCode;
         //根据地理位置信息找到code
-        locationCode=this.findCode(distressedPeople.getProvince(),
+        locationCode=findCode(distressedPeople.getProvince(),
                 distressedPeople.getCity(),
                 distressedPeople.getCountry(),
                 distressedPeople.getTown(),
@@ -85,7 +182,7 @@ public class ChinaAdministrtiveService {
                     map.put("msg", "can not find disaster with this EarthquakeId: "+ distressedPeople.getEarthquakeId());
                 }
                 else {
-                    int grade = gradeCalculate(magnitude, distressedPeople.getNumber());
+                    int grade = gradeCalculate(magnitude, distressedPeople.getNumber(),0);
                     messageCode = "11"
                             + (distressedPeople.getCategory() + 1)
                             + String.format("%03d", distressedPeople.getId())
@@ -102,24 +199,40 @@ public class ChinaAdministrtiveService {
         return map;
     }
 
+
     /**
      * 计算灾害等级
      * @param magnitude
      * @param number
+     * @param category 0人员伤亡 1房屋损坏
      * @return 1特别重大 2重大 3较大 4一般
      */
-    public int gradeCalculate(float magnitude,int number){
-        if(magnitude<5)//一般
-            return 4;
-        else {
-            if(magnitude>=7.0||number>=300)//特别重大
-                return 1;
-            else if((6.0<=magnitude&&magnitude<7)||(number>=50&&number<300))//重大
-                return 2;
-            else if(magnitude<6.0||number<50)//较大
-                return 3;
-            else return 0;
-        }
+    public int gradeCalculate(float magnitude,double number,int category){
+
+            if (magnitude < 5)//一般
+                return 4;
+            else {
+                //人员伤亡
+                if(category==0) {
+                    if (magnitude >= 7.0 || number >= 300)//特别重大
+                        return 1;
+                    else if ((6.0 <= magnitude && magnitude < 7) || (number >= 50 && number < 300))//重大
+                        return 2;
+                    else if (magnitude < 6.0 || number < 50)//较大
+                        return 3;
+                    else return 0;
+                }
+                //房屋损坏面积
+                else {
+                    if (magnitude >= 7.0 || number >= 200)//特别重大
+                        return 1;
+                    else if ((6.0 <= magnitude && magnitude < 7) || (number >= 60 && number < 200))//重大
+                        return 2;
+                    else if (magnitude < 6.0 || number < 60)//较大
+                        return 3;
+                    else return 0;
+                }
+            }
     }
 
     //查询震级
@@ -161,7 +274,7 @@ public class ChinaAdministrtiveService {
             return null;
         }
         //根据地理位置信息找到code
-        code=this.findCode(province,city,country,town,village);
+        code=findCode(province,city,country,town,village);
         if(code==null){
             System.out.println("\nthe location can not find code\n");
             return null;

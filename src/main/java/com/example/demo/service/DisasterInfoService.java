@@ -271,6 +271,7 @@ public class DisasterInfoService {
         } else {
             try {
                 String location = province + city + country + town + village;
+                location=location.replaceAll("null","");
                 String picture = "";
                 Disasterinfo disasterinfo = new Disasterinfo(code, province, city, country, town, village, Timestamp.valueOf(date), location, longitude, latitude, depth, magnitude, picture, reportingUnit);
                 int re = disasterMapper.insert(disasterinfo);

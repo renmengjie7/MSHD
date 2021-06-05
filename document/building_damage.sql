@@ -10,7 +10,7 @@ create table softwaremanage.building_damage
     village                 varchar(255)             null,
     location                varchar(255)             null,
     date                    varchar(100)             null,
-    category                int         default 0    null comment '房屋破坏土木/人员受伤/人员失踪分别对应012',
+    category                int         default 0    null comment '-1 全部 0土木 1砖木 2砖混 3框架 4其他',
     basically_intact_square double      default 0    null,
     damaged_square          double      default 0    null,
     destroyed_square        double      default 0    null,

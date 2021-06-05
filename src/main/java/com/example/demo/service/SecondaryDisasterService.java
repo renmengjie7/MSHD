@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.example.demo.entity.LifelineDisaster;
 import com.example.demo.entity.SecondaryDisaster;
 import com.example.demo.entity.SecondaryDisaster;
 import com.example.demo.mapper.SecondaryDisasterMapper;
@@ -17,14 +18,18 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class SecondaryDisasterService {
 
     @Autowired
     private SecondaryDisasterMapper secondaryDisasterMapper;
+    @Autowired
+    private ChinaAdministrtiveService chinaAdministrtiveService;
     
     //获取某个震情下的数据，给个id，还要能分页，根据地理位置查询
     public DataVO<SecondaryDisaster> getSecondaryDisasterByEarthquakeId(String earthquakeId, int category, int page, int limit){
@@ -64,6 +69,101 @@ public class SecondaryDisasterService {
         else {
             myJSONObject.putResultCode(ResultCode.invalid);
             myJSONObject.putMsg("SecondaryDisaster id does not exist");
+        }
+        return myJSONObject;
+    }
+
+    //增加
+    public JSONObject addSecondaryDisaster(String province, String city, String country, String town, String village, String date, String note, int category, int status, int type, String picture, String reportingUnit, String earthquakeId) {
+        MyJSONObject myJSONObject=new MyJSONObject();
+        String location=province+city+country+town+village;
+        location=location.replaceAll("null","");
+        Timestamp timestamp=null;
+        try{
+            timestamp=Timestamp.valueOf(date);
+        }
+        catch (Exception e){
+            e.printStackTrace();
+        }
+        //进行生命线灾情编码
+        SecondaryDisaster secondaryDisaster=new SecondaryDisaster(province,city,country,town,village,category,status);
+        Map<String,String> map=chinaAdministrtiveService.doSecondaryDisasterCode(secondaryDisaster);
+        if(map.get("resCode")=="0"){
+            myJSONObject.putResultCode(ResultCode.invalid);
+            myJSONObject.putMsg(map.get("msg"));
+        }
+        else{
+            try {
+                secondaryDisaster.setSecondaryId(map.get("msg"));
+                secondaryDisaster.setLocation(location);
+                secondaryDisaster.setDate(timestamp);
+                secondaryDisaster.setReportingUnit(reportingUnit);
+                secondaryDisaster.setEarthquakeId(earthquakeId);
+                secondaryDisaster.setNote(note);
+                secondaryDisaster.setType(type);
+                secondaryDisaster.setPicture(picture);
+                if((secondaryDisasterMapper.insert(secondaryDisaster))==0){
+                    myJSONObject.putMsg("add secondary disaster info fail");
+                    myJSONObject.putResultCode(ResultCode.exception);
+                }
+                else {
+                    myJSONObject.putMsg("add secondary disaster info success");
+                    myJSONObject.putResultCode(ResultCode.success);
+                }
+            }catch (Exception e){
+                myJSONObject.putResultCode(ResultCode.exception);
+                myJSONObject.putMsg(e.toString());
+            }
+        }
+        return myJSONObject;
+    }
+
+    //更新
+    public JSONObject updateSecondaryDisaster(int id, String province, String city, String country, String town, String village, String date, String note, int category, int status, int type, String picture, String reportingUnit, String earthquakeId) {
+        MyJSONObject myJSONObject=new MyJSONObject();
+        //根据ID判断数据表中是否存在该条数据
+        SecondaryDisaster secondaryDisaster=secondaryDisasterMapper.selectById(id);
+        if(secondaryDisaster==null){
+            myJSONObject.putResultCode(ResultCode.invalid);
+            myJSONObject.putMsg("can not find secondary disaster data with the id");
+            return myJSONObject;
+        }
+        //对更新后的灾害信息进行编码
+        secondaryDisaster=new SecondaryDisaster(province,city,country,town,village,category,status);
+        Map<String,String> map=chinaAdministrtiveService.doSecondaryDisasterCode(secondaryDisaster);
+        if(map.get("resCode")=="0"){
+            myJSONObject.putResultCode(ResultCode.invalid);
+            myJSONObject.putMsg(map.get("msg"));
+        }
+        else{
+            Timestamp timestamp=null;
+            try{
+                timestamp=Timestamp.valueOf(date);
+            }
+            catch (Exception e){
+                e.printStackTrace();
+            }
+            String location=province+city+country+town+village;
+            location=location.replaceAll("null","");
+            secondaryDisaster.setSecondaryId(map.get("msg"));
+            secondaryDisaster.setLocation(location);
+            secondaryDisaster.setDate(timestamp);
+            secondaryDisaster.setReportingUnit(reportingUnit);
+            secondaryDisaster.setEarthquakeId(earthquakeId);
+            secondaryDisaster.setNote(note);
+            secondaryDisaster.setType(type);
+            secondaryDisaster.setPicture(picture);
+            UpdateWrapper updateWrapper=new UpdateWrapper();
+            updateWrapper.eq("id",id);
+            if(secondaryDisasterMapper.update(secondaryDisaster,updateWrapper)==0)
+            {
+                myJSONObject.putResultCode(ResultCode.exception);
+                myJSONObject.putMsg("update fail");
+            }
+            else{
+                myJSONObject.putResultCode(ResultCode.success);
+                myJSONObject.putMsg("update success");
+            }
         }
         return myJSONObject;
     }

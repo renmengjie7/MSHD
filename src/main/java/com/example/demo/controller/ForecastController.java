@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.sql.Timestamp;
+
 @RestController
 public class ForecastController {
 
@@ -31,5 +33,29 @@ public class ForecastController {
     public JSONObject deleteForecast(String id) {
         return forecastService.deleteForecast(id);
     }
+
+    //增加预测信息
+    @RequestMapping("/addForecast")
+    @ResponseBody
+    public JSONObject addForecast(String date,
+                                  int grade,
+                                  int intensity,
+                                  int type,
+                                  String picture){
+        return forecastService.addForecast(date,grade,intensity,type,picture);
+    }
+
+    //修改预测信息
+    @RequestMapping("/updateForecast")
+    @ResponseBody
+    public JSONObject addForecast(int id,
+                                  String date,
+                                  int grade,
+                                  int intensity,
+                                  int type,
+                                  String picture){
+        return forecastService.updateForecast(id,date,grade,intensity,type,picture);
+    }
+
 
 }

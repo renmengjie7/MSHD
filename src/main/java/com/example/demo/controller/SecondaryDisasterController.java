@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.sql.Timestamp;
+
 
 @RestController
 public class SecondaryDisasterController {
@@ -30,6 +32,45 @@ public class SecondaryDisasterController {
     @ResponseBody
     public JSONObject deleteSecondaryDisasterById(String id) {
         return secondaryDisasterService.deleteSecondaryDisasterById(id);
+    }
+
+    //增加次生灾害灾情信息
+    @RequestMapping("/addSecondaryDisaster")
+    @ResponseBody
+    public JSONObject addSecondaryDisaster(String province,
+                                           String city,
+                                           String country,
+                                           String town,
+                                           String village,
+                                           String date,
+                                           int category,
+                                           int type,
+                                           int status,
+                                           String picture,
+                                           String reportingUnit,
+                                           String note,
+                                           String earthquakeId){
+        return secondaryDisasterService.addSecondaryDisaster(province,city,country,town,village,date,note,category,status,type,picture,reportingUnit,earthquakeId);
+    }
+
+    //修改生命线灾情信息
+    @RequestMapping("/updateSecondaryDisaster")
+    @ResponseBody
+    public JSONObject updateSecondaryDisaster(int id,
+                                              String province,
+                                              String city,
+                                              String country,
+                                              String town,
+                                              String village,
+                                              String date,
+                                              int category,
+                                              int type,
+                                              int status,
+                                              String picture,
+                                              String reportingUnit,
+                                              String note,
+                                              String earthquakeId){
+        return secondaryDisasterService.updateSecondaryDisaster(id,province,city,country,town,village,date,note,category,status,type,picture,reportingUnit,earthquakeId);
     }
 
 

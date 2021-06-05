@@ -53,4 +53,17 @@ public class BuildingDamage {
         this.moderateDamagedSquare = moderateDamagedSquare;
         this.seriousDamagedSquare = seriousDamagedSquare;
     }
+
+    public BuildingDamage(String province, String city, String country, String town, String village, int category, double destroyedSquare, double damagedSquare,String earthquakeId) {
+        this.province = province;
+        this.city = city;
+        this.country = country;
+        this.town = town;
+        this.village = village;
+        this.category = category;
+        this.damagedSquare = damagedSquare;
+        this.destroyedSquare = destroyedSquare;
+        this.earthquakeId=earthquakeId;
+
+    }
 }
