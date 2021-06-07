@@ -17,6 +17,7 @@ import com.example.demo.vo.DataVO;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -25,7 +26,10 @@ import java.util.Map;
 
 @Service
 public class SecondaryDisasterService {
+    String dirPath = "secondaryDisaster";
 
+    @Autowired
+    private FileOperation fileOperation;
     @Autowired
     private SecondaryDisasterMapper secondaryDisasterMapper;
     @Autowired
@@ -74,7 +78,7 @@ public class SecondaryDisasterService {
     }
 
     //增加
-    public JSONObject addSecondaryDisaster(String province, String city, String country, String town, String village, String date, String note, int category, int status, int type, String picture, String reportingUnit, String earthquakeId) {
+    public JSONObject addSecondaryDisaster(String province, String city, String country, String town, String village, String date, String note, int category, int status, int type, MultipartFile file, String reportingUnit, String earthquakeId) {
         MyJSONObject myJSONObject=new MyJSONObject();
         String location=province+city+country+town+village;
         location=location.replaceAll("null","");
@@ -94,6 +98,7 @@ public class SecondaryDisasterService {
         }
         else{
             try {
+                String picture="";
                 secondaryDisaster.setSecondaryId(map.get("msg"));
                 secondaryDisaster.setLocation(location);
                 secondaryDisaster.setDate(timestamp);
@@ -107,6 +112,17 @@ public class SecondaryDisasterService {
                     myJSONObject.putResultCode(ResultCode.exception);
                 }
                 else {
+                    //插入成功
+                    picture = "/" + fileOperation.saveImg(file, dirPath, secondaryDisaster.getId() + "");
+                    if (picture == null) {
+                        throw new Exception();
+                    } else {
+                        //存入数据库
+                       secondaryDisaster.setPicture(picture.split("/"+dirPath+"/")[1]);
+                        UpdateWrapper<SecondaryDisaster> updateWrapper = Wrappers.update();
+                        updateWrapper.eq("id", secondaryDisaster.getId());
+                        secondaryDisasterMapper.update(secondaryDisaster, updateWrapper);
+                    }
                     myJSONObject.putMsg("add secondary disaster info success");
                     myJSONObject.putResultCode(ResultCode.success);
                 }
@@ -119,7 +135,7 @@ public class SecondaryDisasterService {
     }
 
     //更新
-    public JSONObject updateSecondaryDisaster(int id, String province, String city, String country, String town, String village, String date, String note, int category, int status, int type, String picture, String reportingUnit, String earthquakeId) {
+    public JSONObject updateSecondaryDisaster(int id, String province, String city, String country, String town, String village, String date, String note, int category, int status, int type, MultipartFile file, String reportingUnit, String earthquakeId) throws Exception {
         MyJSONObject myJSONObject=new MyJSONObject();
         //根据ID判断数据表中是否存在该条数据
         SecondaryDisaster secondaryDisaster=secondaryDisasterMapper.selectById(id);
@@ -152,7 +168,17 @@ public class SecondaryDisasterService {
             secondaryDisaster.setEarthquakeId(earthquakeId);
             secondaryDisaster.setNote(note);
             secondaryDisaster.setType(type);
-            secondaryDisaster.setPicture(picture);
+
+            String picture="";
+            if (file!=null&&!file.isEmpty()) {
+                //删除原来的文件，保存现在的文件
+                fileOperation.deleteImg(dirPath+"/"+secondaryDisaster.getPicture());
+                picture = "/" + fileOperation.saveImg(file, dirPath, secondaryDisaster.getPicture());
+                if (picture == null) {
+                    throw new Exception();
+                }
+                secondaryDisaster.setPicture(picture.split("/"+dirPath+"/")[1]);
+            }
             UpdateWrapper updateWrapper=new UpdateWrapper();
             updateWrapper.eq("id",id);
             if(secondaryDisasterMapper.update(secondaryDisaster,updateWrapper)==0)

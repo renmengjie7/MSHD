@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.sql.Timestamp;
 
@@ -46,11 +47,11 @@ public class SecondaryDisasterController {
                                            int category,
                                            int type,
                                            int status,
-                                           String picture,
+                                           MultipartFile file,
                                            String reportingUnit,
                                            String note,
                                            String earthquakeId){
-        return secondaryDisasterService.addSecondaryDisaster(province,city,country,town,village,date,note,category,status,type,picture,reportingUnit,earthquakeId);
+        return secondaryDisasterService.addSecondaryDisaster(province,city,country,town,village,date,note,category,status,type,file,reportingUnit,earthquakeId);
     }
 
     //修改生命线灾情信息
@@ -66,11 +67,11 @@ public class SecondaryDisasterController {
                                               int category,
                                               int type,
                                               int status,
-                                              String picture,
+                                              MultipartFile file,
                                               String reportingUnit,
                                               String note,
-                                              String earthquakeId){
-        return secondaryDisasterService.updateSecondaryDisaster(id,province,city,country,town,village,date,note,category,status,type,picture,reportingUnit,earthquakeId);
+                                              String earthquakeId) throws Exception {
+        return secondaryDisasterService.updateSecondaryDisaster(id,province,city,country,town,village,date,note,category,status,type,file,reportingUnit,earthquakeId);
     }
 
 

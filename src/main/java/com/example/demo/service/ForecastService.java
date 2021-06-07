@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.example.demo.entity.Disasterinfo;
 import com.example.demo.entity.Forecast;
 import com.example.demo.entity.LifelineDisaster;
 import com.example.demo.entity.SecondaryDisaster;
@@ -19,6 +20,7 @@ import com.example.demo.vo.LifelineDisasterVO;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -27,6 +29,10 @@ import java.util.Map;
 
 @Service
 public class ForecastService {
+    String dirPath = "forecast";
+
+    @Autowired
+    private FileOperation fileOperation;
 
     @Autowired
     private ForecastMapper forecastMapper;
@@ -71,7 +77,7 @@ public class ForecastService {
     }
 
     //增加
-    public JSONObject addForecast(String date, int grade, int intensity, int type, String picture) {
+    public JSONObject addForecast(String date, int grade, int intensity, int type, MultipartFile file) {
         MyJSONObject myJSONObject=new MyJSONObject();
         Timestamp timestamp=null;
         try{
@@ -80,6 +86,7 @@ public class ForecastService {
         catch (Exception e){
             e.printStackTrace();
         }
+        String picture="";
         Forecast forecast=new Forecast(timestamp,grade,intensity,type,picture);
         try {
             if((forecastMapper.insert(forecast))==0){
@@ -87,6 +94,17 @@ public class ForecastService {
                 myJSONObject.putResultCode(ResultCode.exception);
             }
             else {
+                //插入了，那就保存图片
+                picture = "/" + fileOperation.saveImg(file, dirPath, forecast.getId() + "");
+                if (picture == null) {
+                    throw new Exception();
+                } else {
+                    //存入数据库
+                    forecast.setPicture(picture.split("/"+dirPath+"/")[1]);
+                    UpdateWrapper<Forecast> forecastUpdateWrapper = Wrappers.update();
+                    forecastUpdateWrapper.eq("id", forecast.getId());
+                    forecastMapper.update(forecast, forecastUpdateWrapper);
+                }
                 myJSONObject.putMsg("add forecast info success");
                 myJSONObject.putResultCode(ResultCode.success);
             }
@@ -98,7 +116,7 @@ public class ForecastService {
     }
 
     //更新
-    public JSONObject updateForecast(int id, String date, int grade, int intensity, int type, String picture) {
+    public JSONObject updateForecast(int id, String date, int grade, int intensity, int type, MultipartFile file) throws Exception {
         MyJSONObject myJSONObject=new MyJSONObject();
         //根据ID判断数据表中是否存在该条数据
         Forecast forecast=forecastMapper.selectById(id);
@@ -114,8 +132,18 @@ public class ForecastService {
         catch (Exception e){
             e.printStackTrace();
         }
-        //对更新后的灾害信息进行编码
+
+        String picture="";
         forecast=new Forecast(timestamp,grade,intensity,type,picture);
+        if (file!=null&&!file.isEmpty()) {
+            //删除原来的文件，保存现在的文件
+            fileOperation.deleteImg(dirPath+"/"+forecast.getPicture());
+            picture = "/" + fileOperation.saveImg(file, dirPath, forecast.getPicture());
+            if (picture == null) {
+                throw new Exception();
+            }
+            forecast.setPicture(picture.split("/"+dirPath+"/")[1]);
+        }
         UpdateWrapper updateWrapper=new UpdateWrapper();
         updateWrapper.eq("id",id);
         if(forecastMapper.update(forecast,updateWrapper)==0)

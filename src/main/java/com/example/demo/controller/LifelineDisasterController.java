@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.sql.Timestamp;
 
@@ -47,10 +48,10 @@ public class LifelineDisasterController {
                                           int category,
                                           int grade,
                                           int type,
-                                          String picture,
+                                          MultipartFile file,
                                           String reportingUnit,
                                           String earthquakeId){
-        return lifelineDisasterService.addLifeLineDisaster(province,city,country,town,village,date,note,category,grade,type,picture,reportingUnit,earthquakeId);
+        return lifelineDisasterService.addLifeLineDisaster(province,city,country,town,village,date,note,category,grade,type,file,reportingUnit,earthquakeId);
     }
 
     //修改生命线灾情信息
@@ -67,10 +68,10 @@ public class LifelineDisasterController {
                                           int category,
                                           int grade,
                                           int type,
-                                          String picture,
+                                          MultipartFile file,
                                           String reportingUnit,
                                           String earthquakeId){
-        return lifelineDisasterService.updateLifeLineDisaster(id,province,city,country,town,village,date,note,category,grade,type,picture,reportingUnit,earthquakeId);
+        return lifelineDisasterService.updateLifeLineDisaster(id,province,city,country,town,village,date,note,category,grade,type,file,reportingUnit,earthquakeId);
     }
 
 

@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.sql.Timestamp;
 
@@ -41,8 +42,8 @@ public class ForecastController {
                                   int grade,
                                   int intensity,
                                   int type,
-                                  String picture){
-        return forecastService.addForecast(date,grade,intensity,type,picture);
+                                  MultipartFile file){
+        return forecastService.addForecast(date,grade,intensity,type,file);
     }
 
     //修改预测信息
@@ -53,8 +54,8 @@ public class ForecastController {
                                   int grade,
                                   int intensity,
                                   int type,
-                                  String picture){
-        return forecastService.updateForecast(id,date,grade,intensity,type,picture);
+                                  MultipartFile file) throws Exception {
+        return forecastService.updateForecast(id,date,grade,intensity,type,file);
     }
 
 

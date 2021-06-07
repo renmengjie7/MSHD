@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.example.demo.entity.DistressedPeople;
+import com.example.demo.entity.Forecast;
 import com.example.demo.entity.LifelineDisaster;
 import com.example.demo.mapper.LifelineDisasterMapper;
 import com.example.demo.utility.MyJSONObject;
@@ -16,6 +17,7 @@ import com.example.demo.vo.DataVO;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -24,7 +26,10 @@ import java.util.Map;
 
 @Service
 public class LifelineDisasterService{
+    String dirPath = "lifelineDisaster";
 
+    @Autowired
+    private FileOperation fileOperation;
     @Autowired
     private LifelineDisasterMapper lifelineDisasterMapper;
     @Autowired
@@ -73,7 +78,7 @@ public class LifelineDisasterService{
     }
 
     //增加一条记录
-    public JSONObject addLifeLineDisaster(String province, String city, String country, String town, String village, String date, String note, int category, int grade, int type, String picture, String reportingUnit, String earthquakeId) {
+    public JSONObject addLifeLineDisaster(String province, String city, String country, String town, String village, String date, String note, int category, int grade, int type, MultipartFile file, String reportingUnit, String earthquakeId) {
         MyJSONObject myJSONObject=new MyJSONObject();
         String location=province+city+country+town+village;
         location=location.replaceAll("null","");
@@ -93,6 +98,7 @@ public class LifelineDisasterService{
         }
         else{
             try {
+                String picture="";
                 lifelineDisaster.setLifelineId(map.get("msg"));
                 lifelineDisaster.setLocation(location);
                 lifelineDisaster.setDate(timestamp);
@@ -102,6 +108,17 @@ public class LifelineDisasterService{
                 lifelineDisaster.setType(type);
                 lifelineDisaster.setPicture(picture);
                 if((lifelineDisasterMapper.insert(lifelineDisaster))==0){
+                    //插入成功
+                    picture = "/" + fileOperation.saveImg(file, dirPath, lifelineDisaster.getId() + "");
+                    if (picture == null) {
+                        throw new Exception();
+                    } else {
+                        //存入数据库
+                        lifelineDisaster.setPicture(picture.split("/"+dirPath+"/")[1]);
+                        UpdateWrapper<LifelineDisaster> lifelineDisasterUpdateWrapper = Wrappers.update();
+                        lifelineDisasterUpdateWrapper.eq("id", lifelineDisaster.getId());
+                        lifelineDisasterMapper.update(lifelineDisaster, lifelineDisasterUpdateWrapper);
+                    }
                     myJSONObject.putMsg("add lifeline disaster info fail");
                     myJSONObject.putResultCode(ResultCode.exception);
                 }
@@ -118,7 +135,7 @@ public class LifelineDisasterService{
     }
 
     //更新生命线灾情数据
-    public JSONObject updateLifeLineDisaster(int id, String province, String city, String country, String town, String village, String date, String note, int category, int grade, int type, String picture, String reportingUnit, String earthquakeId) {
+    public JSONObject updateLifeLineDisaster(int id, String province, String city, String country, String town, String village, String date, String note, int category, int grade, int type, MultipartFile file, String reportingUnit, String earthquakeId) throws Exception {
         MyJSONObject myJSONObject=new MyJSONObject();
         //根据ID判断数据表中是否存在该条数据
         LifelineDisaster lifelineDisaster=lifelineDisasterMapper.selectById(id);
@@ -142,6 +159,7 @@ public class LifelineDisasterService{
             catch (Exception e){
                 e.printStackTrace();
             }
+
             String location=province+city+country+town+village;
             location=location.replaceAll("null","");
             lifelineDisaster.setLifelineId(map.get("msg"));
@@ -151,7 +169,17 @@ public class LifelineDisasterService{
             lifelineDisaster.setEarthquakeId(earthquakeId);
             lifelineDisaster.setNote(note);
             lifelineDisaster.setType(type);
-            lifelineDisaster.setPicture(picture);
+
+            String picture="";
+            if (file!=null&&!file.isEmpty()) {
+                //删除原来的文件，保存现在的文件
+                fileOperation.deleteImg(dirPath+"/"+lifelineDisaster.getPicture());
+                picture = "/" + fileOperation.saveImg(file, dirPath, lifelineDisaster.getPicture());
+                if (picture == null) {
+                    throw new Exception();
+                }
+                lifelineDisaster.setPicture(picture.split("/"+dirPath+"/")[1]);
+            }
             UpdateWrapper updateWrapper=new UpdateWrapper();
             updateWrapper.eq("id",id);
             if(lifelineDisasterMapper.update(lifelineDisaster,updateWrapper)==0)
