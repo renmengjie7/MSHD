@@ -95,7 +95,9 @@ public class ForecastService {
             }
             else {
                 //插入了，那就保存图片
-                picture = "/" + fileOperation.saveImg(file, dirPath, forecast.getId() + "");
+                String fileName = file.getOriginalFilename();
+                fileName=fileName.substring(0,fileName.lastIndexOf("."));;
+                picture = "/" + fileOperation.saveImg(file, dirPath, fileName);
                 if (picture == null) {
                     throw new Exception();
                 } else {
@@ -134,16 +136,26 @@ public class ForecastService {
         }
 
         String picture="";
+        String fileName="";
         forecast=new Forecast(timestamp,grade,intensity,type,picture);
-        if (file!=null&&!file.isEmpty()) {
-            //删除原来的文件，保存现在的文件
-            fileOperation.deleteImg(dirPath+"/"+forecast.getPicture());
-            picture = "/" + fileOperation.saveImg(file, dirPath, forecast.getPicture());
-            if (picture == null) {
-                throw new Exception();
-            }
-            forecast.setPicture(picture.split("/"+dirPath+"/")[1]);
+        if(forecast.getPicture()==null||forecast.getPicture()==""){//原来不存在图片
+            fileName = file.getOriginalFilename();
+            fileName=fileName.substring(0,fileName.lastIndexOf("."));;
+            System.out.printf("\nfilename="+fileName);
         }
+        else {
+            //删除原来的文件，保存现在的文件
+            fileOperation.deleteImg(dirPath + "/" + forecast.getPicture());
+            fileName=forecast.getPicture();
+        }
+        picture = "/" + fileOperation.saveImg(file, dirPath, fileName);
+        System.out.printf("\n"+picture.split("/"+dirPath+"/")[1]);
+        System.out.printf("\n"+picture);
+        if (picture == null) {
+            throw new Exception();
+        }
+        forecast.setPicture(picture.split("/"+dirPath+"/")[1]);
+
         UpdateWrapper updateWrapper=new UpdateWrapper();
         updateWrapper.eq("id",id);
         if(forecastMapper.update(forecast,updateWrapper)==0)
