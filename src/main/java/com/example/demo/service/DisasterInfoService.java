@@ -68,6 +68,7 @@ public class DisasterInfoService {
                 jsonObject.put("latitude",disasterinfo.getLatitude());
                 jsonObject.put("depth",disasterinfo.getDepth());
                 jsonObject.put("magnitude",disasterinfo.getMagnitude());
+                jsonObject.put("earthquakeId",disasterinfo.getDId());
 
                 try {
                     jsonObject.put("value", DateCount.getDayDiffer(disasterinfo.getDate(),endDate));

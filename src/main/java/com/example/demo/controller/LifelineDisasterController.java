@@ -70,7 +70,7 @@ public class LifelineDisasterController {
                                           int type,
                                           MultipartFile file,
                                           String reportingUnit,
-                                          String earthquakeId){
+                                          String earthquakeId) throws Exception {
         return lifelineDisasterService.updateLifeLineDisaster(id,province,city,country,town,village,date,note,category,grade,type,file,reportingUnit,earthquakeId);
     }
 
