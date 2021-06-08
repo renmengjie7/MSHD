@@ -95,17 +95,17 @@ public class ForecastService {
             }
             else {
                 //插入了，那就保存图片
-                String fileName = file.getOriginalFilename();
-                fileName=fileName.substring(0,fileName.lastIndexOf("."));;
-                picture = "/" + fileOperation.saveImg(file, dirPath, fileName);
-                if (picture == null) {
-                    throw new Exception();
-                } else {
-                    //存入数据库
-                    forecast.setPicture(picture.split("/"+dirPath+"/")[1]);
-                    UpdateWrapper<Forecast> forecastUpdateWrapper = Wrappers.update();
-                    forecastUpdateWrapper.eq("id", forecast.getId());
-                    forecastMapper.update(forecast, forecastUpdateWrapper);
+                if (file!=null&&!file.isEmpty()) {
+                    picture = "/" + fileOperation.saveImg(file, dirPath, forecast.getId() + "");
+                    if (picture == null) {
+                        throw new Exception();
+                    } else {
+                        //存入数据库
+                        forecast.setPicture(picture.split("/"+dirPath+"/")[1]);
+                        UpdateWrapper<Forecast> forecastUpdateWrapper = Wrappers.update();
+                        forecastUpdateWrapper.eq("id", forecast.getId());
+                        forecastMapper.update(forecast, forecastUpdateWrapper);
+                    }
                 }
                 myJSONObject.putMsg("add forecast info success");
                 myJSONObject.putResultCode(ResultCode.success);
@@ -135,26 +135,16 @@ public class ForecastService {
             e.printStackTrace();
         }
 
-        String picture="";
-        String fileName="";
-        forecast=new Forecast(timestamp,grade,intensity,type,picture);
-        if(forecast.getPicture()==null||forecast.getPicture()==""){//原来不存在图片
-            fileName = file.getOriginalFilename();
-            fileName=fileName.substring(0,fileName.lastIndexOf("."));;
-            System.out.printf("\nfilename="+fileName);
-        }
-        else {
-            //删除原来的文件，保存现在的文件
+        String picture = "";
+        forecast = new Forecast(timestamp, grade, intensity, type, picture);
+        if (file!=null&&!file.isEmpty()) {
             fileOperation.deleteImg(dirPath + "/" + forecast.getPicture());
-            fileName=forecast.getPicture();
+            picture = "/" + fileOperation.saveImg(file, dirPath, forecast.getId() + "");
+            if (picture == null) {
+                throw new Exception();
+            }
+            forecast.setPicture(picture.split("/" + dirPath + "/")[1]);
         }
-        picture = "/" + fileOperation.saveImg(file, dirPath, fileName);
-        System.out.printf("\n"+picture.split("/"+dirPath+"/")[1]);
-        System.out.printf("\n"+picture);
-        if (picture == null) {
-            throw new Exception();
-        }
-        forecast.setPicture(picture.split("/"+dirPath+"/")[1]);
 
         UpdateWrapper updateWrapper=new UpdateWrapper();
         updateWrapper.eq("id",id);

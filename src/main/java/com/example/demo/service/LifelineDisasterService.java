@@ -113,19 +113,17 @@ public class LifelineDisasterService{
                 }
                 else {
                     //插入成功
-                    String fileName = file.getOriginalFilename();
-                    fileName=fileName.substring(0,fileName.lastIndexOf("."));;
-                    picture = "/" + fileOperation.saveImg(file, dirPath, fileName);
-                    System.out.printf("\n"+picture.split("/"+dirPath+"/")[1]);
-                    System.out.printf("\n"+picture);
-                    if (picture == null) {
-                        throw new Exception();
-                    } else {
-                        //存入数据库
-                        lifelineDisaster.setPicture(picture.split("/"+dirPath+"/")[1]);
-                        UpdateWrapper<LifelineDisaster> lifelineDisasterUpdateWrapper = Wrappers.update();
-                        lifelineDisasterUpdateWrapper.eq("id", lifelineDisaster.getId());
-                        lifelineDisasterMapper.update(lifelineDisaster, lifelineDisasterUpdateWrapper);
+                    if (file!=null&&!file.isEmpty()) {
+                        picture = "/" + fileOperation.saveImg(file, dirPath, lifelineDisaster.getId() + "");
+                        if (picture == null) {
+                            throw new Exception();
+                        } else {
+                            //存入数据库
+                            lifelineDisaster.setPicture(picture.split("/"+dirPath+"/")[1]);
+                            UpdateWrapper<LifelineDisaster> lifelineDisasterUpdateWrapper = Wrappers.update();
+                            lifelineDisasterUpdateWrapper.eq("id", lifelineDisaster.getId());
+                            lifelineDisasterMapper.update(lifelineDisaster, lifelineDisasterUpdateWrapper);
+                        }
                     }
                     myJSONObject.putMsg("add lifeline disaster info success");
                     myJSONObject.putResultCode(ResultCode.success);
@@ -175,21 +173,9 @@ public class LifelineDisasterService{
             lifelineDisaster.setType(type);
 
             String picture="";
-            String fileName="";
             if (file!=null&&!file.isEmpty()) {
-                if(lifelineDisaster.getPicture()==null||lifelineDisaster.getPicture()==""){//原来不存在图片
-                    fileName = file.getOriginalFilename();
-                    fileName=fileName.substring(0,fileName.lastIndexOf("."));;
-                    System.out.printf("\nfilename="+fileName);
-                }
-                else {
-                    //删除原来的文件，保存现在的文件
-                    fileOperation.deleteImg(dirPath + "/" + lifelineDisaster.getPicture());
-                    fileName=lifelineDisaster.getPicture();
-                }
-                picture = "/" + fileOperation.saveImg(file, dirPath, fileName);
-                System.out.printf("\n"+picture.split("/"+dirPath+"/")[1]);
-                System.out.printf("\n"+picture);
+                fileOperation.deleteImg(dirPath+"/"+lifelineDisaster.getPicture());
+                picture = "/" + fileOperation.saveImg(file, dirPath, lifelineDisaster.getId() + "");
                 if (picture == null) {
                     throw new Exception();
                 }

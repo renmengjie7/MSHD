@@ -113,17 +113,17 @@ public class SecondaryDisasterService {
                 }
                 else {
                     //插入成功
-                    String fileName = file.getOriginalFilename();
-                    fileName=fileName.substring(0,fileName.lastIndexOf("."));;
-                    picture = "/" + fileOperation.saveImg(file, dirPath, fileName);
-                    if (picture == null) {
-                        throw new Exception();
-                    } else {
-                        //存入数据库
-                       secondaryDisaster.setPicture(picture.split("/"+dirPath+"/")[1]);
-                        UpdateWrapper<SecondaryDisaster> updateWrapper = Wrappers.update();
-                        updateWrapper.eq("id", secondaryDisaster.getId());
-                        secondaryDisasterMapper.update(secondaryDisaster, updateWrapper);
+                    if (file!=null&&!file.isEmpty()) {
+                        picture = "/" + fileOperation.saveImg(file, dirPath, secondaryDisaster.getId() + "");
+                        if (picture == null) {
+                            throw new Exception();
+                        } else {
+                            //存入数据库
+                            secondaryDisaster.setPicture(picture.split("/"+dirPath+"/")[1]);
+                            UpdateWrapper<SecondaryDisaster> updateWrapper = Wrappers.update();
+                            updateWrapper.eq("id", secondaryDisaster.getId());
+                            secondaryDisasterMapper.update(secondaryDisaster, updateWrapper);
+                        }
                     }
                     myJSONObject.putMsg("add secondary disaster info success");
                     myJSONObject.putResultCode(ResultCode.success);
@@ -170,26 +170,15 @@ public class SecondaryDisasterService {
             secondaryDisaster.setEarthquakeId(earthquakeId);
             secondaryDisaster.setNote(note);
             secondaryDisaster.setType(type);
-
-            String picture="";
-            String fileName="";
-            if(secondaryDisaster.getPicture()==null||secondaryDisaster.getPicture()==""){//原来不存在图片
-                fileName = file.getOriginalFilename();
-                fileName=fileName.substring(0,fileName.lastIndexOf("."));;
-                System.out.printf("\nfilename="+fileName);
-            }
-            else {
-                //删除原来的文件，保存现在的文件
+            if (file!=null&&!file.isEmpty()) {
+                String picture="";
                 fileOperation.deleteImg(dirPath + "/" + secondaryDisaster.getPicture());
-                fileName=secondaryDisaster.getPicture();
+                picture = "/" + fileOperation.saveImg(file, dirPath, secondaryDisaster.getId() + "");
+                if (picture == null) {
+                    throw new Exception();
+                }
+                secondaryDisaster.setPicture(picture.split("/" + dirPath + "/")[1]);
             }
-            picture = "/" + fileOperation.saveImg(file, dirPath, fileName);
-            System.out.printf("\n"+picture.split("/"+dirPath+"/")[1]);
-            System.out.printf("\n"+picture);
-            if (picture == null) {
-                throw new Exception();
-            }
-            secondaryDisaster.setPicture(picture.split("/"+dirPath+"/")[1]);
 
             UpdateWrapper updateWrapper=new UpdateWrapper();
             updateWrapper.eq("id",id);
