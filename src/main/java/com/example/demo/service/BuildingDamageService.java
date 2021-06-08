@@ -97,6 +97,14 @@ public class BuildingDamageService {
         }
         else{
             try {
+                basicallyIntactSquare=(basicallyIntactSquare==null?0:(double)basicallyIntactSquare);
+                slightDamagedSquare=(slightDamagedSquare==null?0:(double)slightDamagedSquare);
+                moderateDamagedSquare=(moderateDamagedSquare==null?0:(double)moderateDamagedSquare);
+                seriousDamagedSquare=(seriousDamagedSquare==null?0:(double)seriousDamagedSquare);
+                buildingDamage.setBasicallyIntactSquare(basicallyIntactSquare);
+                buildingDamage.setSlightDamagedSquare(slightDamagedSquare);
+                buildingDamage.setModerateDamagedSquare(moderateDamagedSquare);
+                buildingDamage.setSeriousDamagedSquare(seriousDamagedSquare);
                 buildingDamage.setBuildingDamageId(map.get("msg"));
                 buildingDamage.setLocation(location);
                 buildingDamage.setDate(timestamp);
@@ -148,6 +156,14 @@ public class BuildingDamageService {
             }
             String location=province+city+country+town+village;
             location=location.replaceAll("null","");
+            basicallyIntactSquare=(basicallyIntactSquare==null?0:(double)basicallyIntactSquare);
+            slightDamagedSquare=(slightDamagedSquare==null?0:(double)slightDamagedSquare);
+            moderateDamagedSquare=(moderateDamagedSquare==null?0:(double)moderateDamagedSquare);
+            seriousDamagedSquare=(seriousDamagedSquare==null?0:(double)seriousDamagedSquare);
+            buildingDamage.setBasicallyIntactSquare(basicallyIntactSquare);
+            buildingDamage.setSlightDamagedSquare(slightDamagedSquare);
+            buildingDamage.setModerateDamagedSquare(moderateDamagedSquare);
+            buildingDamage.setSeriousDamagedSquare(seriousDamagedSquare);
             buildingDamage.setBuildingDamageId(map.get("msg"));
             buildingDamage.setLocation(location);
             buildingDamage.setDate(timestamp);
