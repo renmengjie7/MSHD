@@ -26,7 +26,7 @@ import java.util.Map;
 
 @Service
 public class SecondaryDisasterService {
-    String dirPath = "secondaryDisaster";
+    String dirPath = "second";
 
     @Autowired
     private FileOperation fileOperation;

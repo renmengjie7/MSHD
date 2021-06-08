@@ -7,10 +7,7 @@ import com.example.demo.service.ForecastService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.sql.Timestamp;
@@ -47,6 +44,7 @@ public class ForecastController {
     }
 
     //修改预测信息
+    @CrossOrigin
     @RequestMapping("/updateForecast")
     @ResponseBody
     public JSONObject addForecast(int id,
