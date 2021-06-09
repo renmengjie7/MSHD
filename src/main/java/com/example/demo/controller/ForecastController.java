@@ -44,7 +44,7 @@ public class ForecastController {
     }
 
     //修改预测信息
-    @CrossOrigin
+    @CrossOrigin("*")
     @RequestMapping("/updateForecast")
     @ResponseBody
     public JSONObject addForecast(int id,
